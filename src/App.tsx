@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
+import { RetailerProvider } from "./contexts/RetailerContext";
 import Layout from "./components/Layout";
 import LoadingScreen from "./components/LoadingScreen";
 
@@ -23,23 +24,25 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Suspense fallback={<LoadingScreen />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/coupons" element={<Coupons />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/shopping-list" element={<ShoppingList />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </Layout>
-      </BrowserRouter>
+      <RetailerProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<LoadingScreen />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/coupons" element={<Coupons />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/shopping-list" element={<ShoppingList />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
+      </RetailerProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
