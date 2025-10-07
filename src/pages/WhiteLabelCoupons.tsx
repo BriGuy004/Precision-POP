@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CouponSwiper from "@/components/CouponSwiper";
-import SessionSavingsTracker from "@/components/SessionSavingsTracker";
+import SessionSavingsTracker from "@/components/WhiteLabelSessionSavingsTracker";
 import CouponBrowser from "@/components/CouponBrowser";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
