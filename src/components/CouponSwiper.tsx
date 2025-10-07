@@ -56,6 +56,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
     return unsubscribe;
   }, [x]);
 
+  // Load personalized coupons and append them to H-E-B coupons (show H-E-B coupons first)
   useEffect(() => {
     const loadPersonalizedCoupons = async () => {
       setIsLoading(true);
@@ -79,8 +80,8 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
             campaignId: pc.campaignId,
           }));
           
-          // Prepend personalized coupons to H-E-B coupons
-          setCoupons(prevCoupons => [...newCoupons, ...hebCoupons]);
+          // Append personalized coupons AFTER H-E-B coupons (so H-E-B shows first)
+          setCoupons(prevCoupons => [...hebCoupons, ...newCoupons]);
           
           const aiGeneratedCount = newCoupons.filter((c: any) => c.aiGenerated).length;
           

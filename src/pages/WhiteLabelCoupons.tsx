@@ -10,6 +10,7 @@ import { useRetailer } from "@/contexts/RetailerContext";
 import { Coupon } from "@/components/coupon/types";
 import krogerLogo from "@/assets/kroger-logo.png";
 import hebLogo from "@/assets/heb-logo.png";
+import hebCoupons from "@/data/hebCoupons";
 
 const Coupons = () => {
   const { toast } = useToast();
@@ -20,64 +21,8 @@ const Coupons = () => {
   const [savedCoupons, setSavedCoupons] = useState<Coupon[]>([]);
   const [customerName, setCustomerName] = useState("Alice");
   
-  const today = new Date().toISOString();
-  
-  const [coupons, setCoupons] = useState<Coupon[]>([
-    {
-      id: "1",
-      title: "Buy One Get One Free",
-      description: "Stacy's Fire Roasted Jalapeño Pita Chips",
-      image: "/lovable-uploads/7ebdba46-cfd6-4842-b7a0-3ba927797be4.png",
-      expiresAt: today,
-      category: "Snacks",
-      value: 3.99,
-    },
-    {
-      id: "2",
-      title: "30% Off",
-      description: "Fresh Organic Strawberries",
-      image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: today,
-      category: "Produce",
-      value: 2.50,
-    },
-    {
-      id: "3",
-      title: "Save $2.00",
-      description: "Premium Coffee Beans",
-      image: "https://images.unsplash.com/photo-1497636577773-f1231844b336?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: today,
-      category: "Beverages",
-      value: 2.00,
-    },
-    {
-      id: "4",
-      title: "Buy 2 Get 1 Free",
-      description: "Freshly Baked Sourdough Bread",
-      image: "https://images.unsplash.com/photo-1549931319-a545dcf3bc7c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: today,
-      category: "Bakery",
-      value: 4.99,
-    },
-    {
-      id: "5",
-      title: "50% Off",
-      description: "Grass-Fed Ground Beef",
-      image: "https://images.unsplash.com/photo-1613454320421-4516f9c6540d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: today,
-      category: "Meat",
-      value: 5.75,
-    },
-    {
-      id: "6",
-      title: "$1 Off",
-      description: "Organic Cage-Free Eggs",
-      image: "https://images.unsplash.com/photo-1598965402089-897ce52e8355?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: today,
-      category: "Dairy",
-      value: 1.00,
-    },
-  ]);
+  // Use real H-E-B coupons for both Discover and Browse tabs
+  const coupons = hebCoupons;
 
   useEffect(() => {
     const storedName = sessionStorage.getItem('customerName');
