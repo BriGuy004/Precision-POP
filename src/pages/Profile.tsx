@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useRetailer } from "@/contexts/RetailerContext"; // 🎨 WHITE-LABEL IMPORT
 import {
   User,
   Bell,
@@ -19,14 +20,18 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
+  Store,
+  Check,
 } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import SavingsDashboard from "@/components/SavingsDashboard";
 
 const Profile = () => {
   const { toast } = useToast();
+  const { retailer, retailerId, switchRetailer, allRetailers } = useRetailer(); // 🎨 WHITE-LABEL HOOK
   const [isEditing, setIsEditing] = useState(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
+  const [isRetailerSwitcherExpanded, setIsRetailerSwitcherExpanded] = useState(false); // 🎨 NEW STATE
   
   // Mock user data
   const [userData, setUserData] = useState({
@@ -103,6 +108,15 @@ const Profile = () => {
     }));
   };
   
+  // 🎨 Handle retailer switch
+  const handleRetailerSwitch = (newRetailerId: string) => {
+    switchRetailer(newRetailerId as any);
+    toast({
+      title: "Retailer Changed",
+      description: `Switched to ${allRetailers[newRetailerId].name}`,
+    });
+  };
+  
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -120,7 +134,7 @@ const Profile = () => {
   };
   
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="container mx-auto px-4 py-6 space-y-6 pb-24 md:pb-6">
       <motion.h1
         className="text-2xl font-bold mb-6"
         initial={{ opacity: 0, y: -20 }}
@@ -243,8 +257,14 @@ const Profile = () => {
             transition={{ duration: 0.4 }}
           >
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+              <div 
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${retailer.theme.primary}20` }}
+              >
+                <User 
+                  className="w-8 h-8"
+                  style={{ color: retailer.theme.primary }}
+                />
               </div>
               <div>
                 <h2 className="text-xl font-semibold">{userData.name}</h2>
@@ -261,6 +281,99 @@ const Profile = () => {
                 Edit Profile
               </Button>
             </div>
+          </motion.div>
+          
+          {/* 🎨 RETAILER SWITCHER SECTION (NEW!) */}
+          <motion.div
+            className="glass-card rounded-xl overflow-hidden mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+          >
+            <div 
+              className="p-4 flex justify-between items-center cursor-pointer border-b border-border"
+              style={{ backgroundColor: `${retailer.theme.primary}10` }}
+              onClick={() => setIsRetailerSwitcherExpanded(!isRetailerSwitcherExpanded)}
+            >
+              <div className="flex items-center gap-3">
+                <Store 
+                  className="w-5 h-5"
+                  style={{ color: retailer.theme.primary }}
+                />
+                <div>
+                  <h2 className="text-lg font-semibold">Demo: Retailer Branding</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Switch between retailers to see white-label theming
+                  </p>
+                </div>
+              </div>
+              {isRetailerSwitcherExpanded ? (
+                <ChevronUp className="w-5 h-5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              )}
+            </div>
+            
+            {isRetailerSwitcherExpanded && (
+              <div className="p-4 space-y-3">
+                {Object.entries(allRetailers).map(([id, config]) => (
+                  <motion.button
+                    key={id}
+                    onClick={() => handleRetailerSwitch(id)}
+                    className="w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md"
+                    style={{
+                      borderColor: retailerId === id ? config.theme.primary : '#e5e7eb',
+                      backgroundColor: retailerId === id ? `${config.theme.primary}10` : 'white',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div 
+                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md"
+                        style={{ backgroundColor: config.theme.primary }}
+                      >
+                        {config.shortName.charAt(0)}
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold">{config.name}</div>
+                        <div className="text-sm text-muted-foreground">{config.tagline}</div>
+                      </div>
+                    </div>
+                    
+                    {retailerId === id && (
+                      <Check 
+                        className="w-6 h-6" 
+                        style={{ color: config.theme.primary }}
+                      />
+                    )}
+                  </motion.button>
+                ))}
+                
+                {/* Color Preview */}
+                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
+                  <h4 className="font-semibold mb-3 text-sm">Current Theme Colors:</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {Object.entries(retailer.theme).map(([key, color]) => (
+                      <div key={key} className="text-xs">
+                        <div 
+                          className="w-full h-10 rounded border border-border mb-1"
+                          style={{ backgroundColor: color }}
+                        />
+                        <div className="text-muted-foreground capitalize truncate">{key}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Instructions */}
+                <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-lg">
+                  <p>🎨 All colors and branding update automatically</p>
+                  <p>🚀 Deploy separate apps or use subdomains</p>
+                  <p>💡 Perfect for investor demos</p>
+                </div>
+              </div>
+            )}
           </motion.div>
           
           {/* Loyalty Card Section */}
