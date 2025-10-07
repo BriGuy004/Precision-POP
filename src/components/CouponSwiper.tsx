@@ -1,4 +1,4 @@
-// Enhanced CouponSwiper.tsx with analytics integration
+// Enhanced CouponSwiper.tsx with real H-E-B coupon data
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -11,49 +11,14 @@ import SwipeControls from "./coupon/WhiteLabelSwipeControls";
 import RecoverButton from "./coupon/RecoverButton";
 import SwipeDirectionOverlay from "./coupon/SwipeDirectionOverlay";
 import EmptyState from "./coupon/EmptyState";
+import hebCoupons from "@/data/hebCoupons";
 
 const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps) => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const [coupons, setCoupons] = useState<Coupon[]>([
-    {
-      id: "1",
-      title: "Buy One Get One Free",
-      description: "Stacy's Fire Roasted Jalapeño Pita Chips",
-      image: "/lovable-uploads/7ebdba46-cfd6-4842-b7a0-3ba927797be4.png",
-      expiresAt: "2023-12-31",
-      category: "Snacks",
-      value: 3.99,
-      brandId: "stacys",
-      campaignId: "stacys_bogo_2024",
-    },
-    {
-      id: "2",
-      title: "30% Off",
-      description: "Fresh Organic Strawberries",
-      image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: "2023-12-25",
-      category: "Produce",
-      value: 2.50,
-      brandId: "heb_organic",
-      campaignId: "organic_produce_2024",
-    },
-    {
-      id: "3",
-      title: "Save $2.00",
-      description: "Premium Coffee Beans",
-      image: "https://images.unsplash.com/photo-1497636577773-f1231844b336?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-      expiresAt: "2023-12-22",
-      category: "Beverages",
-      value: 2.00,
-      brandId: "premium_coffee_co",
-      campaignId: "coffee_savings_2024",
-      isPersonalized: true,
-      aiGenerated: true,
-      conversionProbability: 0.73,
-    },
-  ]);
+  // 🎨 START WITH REAL H-E-B COUPONS
+  const [coupons, setCoupons] = useState<Coupon[]>(hebCoupons);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<string | null>(null);
@@ -114,13 +79,14 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
             campaignId: pc.campaignId,
           }));
           
-          setCoupons(prevCoupons => [...newCoupons, ...prevCoupons]);
+          // Prepend personalized coupons to H-E-B coupons
+          setCoupons(prevCoupons => [...newCoupons, ...hebCoupons]);
           
           const aiGeneratedCount = newCoupons.filter((c: any) => c.aiGenerated).length;
           
           toast({
             title: "Personalized Coupons",
-            description: `${newCoupons.length} personalized coupons have been added${aiGeneratedCount > 0 ? `, including ${aiGeneratedCount} AI-generated offers` : ''}.`,
+            description: `${newCoupons.length} personalized coupons added to your ${hebCoupons.length} H-E-B deals${aiGeneratedCount > 0 ? `, including ${aiGeneratedCount} AI-generated offers` : ''}.`,
           });
         }
       } catch (error) {
@@ -288,9 +254,9 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
       {/* Analytics Debug Panel - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed bottom-4 left-4 bg-black/80 text-white p-2 rounded text-xs">
-          <div>Session: {analyticsService['sessionId']?.slice(-8)}</div>
-          <div>Current: {currentCoupon?.id}</div>
-          <div>View Time: {Math.round((Date.now() - cardViewStartTime) / 1000)}s</div>
+          <div>Real H-E-B Coupons: {hebCoupons.length}</div>
+          <div>Current: {currentIndex + 1}/{coupons.length}</div>
+          <div>Remaining: {coupons.length - currentIndex}</div>
         </div>
       )}
     </div>
