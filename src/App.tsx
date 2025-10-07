@@ -14,7 +14,7 @@ import LoadingScreen from "./components/LoadingScreen";
 const Index = lazy(() => import("./pages/Index"));
 const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
-const Coupons = lazy(() => import("./pages/Coupons"));
+const Coupons = lazy(() => import("./pages/WhiteLabelCoupons"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ShoppingList = lazy(() => import("./pages/ShoppingList"));
 const NotFound = lazy(() => import("./pages/NotFound"));
