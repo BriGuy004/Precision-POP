@@ -2,6 +2,7 @@
 import React from "react";
 import { Star, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRetailer } from "@/contexts/RetailerContext";
 
 interface Coupon {
   id: string;
@@ -40,6 +41,8 @@ const getCouponGradient = (category?: string) => {
 };
 
 export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => {
+  const { retailer } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+
   return (
     <div 
       className={cn(
@@ -51,8 +54,13 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
       data-coupon-value={coupon?.value.toFixed(2)}
     >
       <div className="relative h-full flex flex-col rounded-xl overflow-hidden">
-        <div className="absolute top-2 left-2 z-10 bg-white/90 p-1.5 rounded-full shadow-md">
-          <img src="/lovable-uploads/90ab9748-bbf9-4c76-bea3-2294d748f78e.png" alt="H-E-B" className="w-6 h-6 object-contain" />
+        {/* 🎨 WHITE-LABELED LOGO - Dynamic Retailer Branding */}
+        <div className="absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-md" style={{
+          backgroundColor: retailer.theme.primary,
+        }}>
+          <div className="w-6 h-6 flex items-center justify-center text-white font-bold text-xs">
+            {retailer.shortName.charAt(0)}
+          </div>
         </div>
               
         {coupon?.isPersonalized && (
@@ -72,7 +80,13 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
               
         <div className="flex-1 flex flex-col p-4 bg-white/90 rounded-b-lg shadow-inner relative">
           <div className="mt-3 pr-4">
-            <h3 className="text-lg font-bold text-primary">{coupon?.title}</h3>
+            {/* 🎨 WHITE-LABELED TITLE - Uses retailer primary color */}
+            <h3 
+              className="text-lg font-bold"
+              style={{ color: retailer.theme.primary }}
+            >
+              {coupon?.title}
+            </h3>
             <p className="text-sm text-gray-700 font-medium line-clamp-2 mt-1">{coupon?.description}</p>
                   
             {coupon?.reason && (
@@ -82,10 +96,18 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
             )}
                   
             <div className="flex justify-between items-center mt-3">
-              <div className="bg-red-100 text-red-600 px-2 py-0.5 rounded text-xs font-semibold">
+              {/* 🎨 WHITE-LABELED EXPIRATION - Uses retailer error color */}
+              <div 
+                className="px-2 py-0.5 rounded text-xs font-semibold text-white"
+                style={{ backgroundColor: retailer.theme.error }}
+              >
                 Expires Today
               </div>
-              <div className="bg-red-500 text-white px-2 py-0.5 rounded-full font-bold shadow-md flex items-center gap-1">
+              {/* 🎨 WHITE-LABELED VALUE - Uses retailer accent color */}
+              <div 
+                className="text-white px-2 py-0.5 rounded-full font-bold shadow-md flex items-center gap-1"
+                style={{ backgroundColor: retailer.theme.accent }}
+              >
                 <Scissors className="w-3 h-3" />
                 <span>${coupon?.value.toFixed(2)}</span>
               </div>
