@@ -26,6 +26,7 @@ import {
 import LoyaltyCard from "@/components/LoyaltyCard";
 import SavingsDashboard from "@/components/SavingsDashboard";
 import krogerLogo from "@/assets/kroger-logo.png";
+import hebLogo from "@/assets/heb-logo.png";
 
 const Profile = () => {
   const { toast } = useToast();
@@ -333,6 +334,12 @@ const Profile = () => {
                       {id === 'kroger' ? (
                         <img 
                           src={krogerLogo} 
+                          alt={`${config.name} Logo`}
+                          className="h-12 w-auto"
+                        />
+                      ) : id === 'heb' ? (
+                        <img 
+                          src={hebLogo} 
                           alt={`${config.name} Logo`}
                           className="h-12 w-auto"
                         />

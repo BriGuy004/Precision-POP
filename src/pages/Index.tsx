@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRetailer } from "@/contexts/RetailerContext"; // 🎨 WHITE-LABEL IMPORT
 import krogerLogo from "@/assets/kroger-logo.png";
+import hebLogo from "@/assets/heb-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -31,6 +32,12 @@ const Index = () => {
           {retailerId === 'kroger' ? (
             <img 
               src={krogerLogo} 
+              alt={`${retailer.name} Logo`}
+              className="h-32 w-auto"
+            />
+          ) : retailerId === 'heb' ? (
+            <img 
+              src={hebLogo} 
               alt={`${retailer.name} Logo`}
               className="h-32 w-auto"
             />
@@ -90,6 +97,12 @@ const Index = () => {
             {retailerId === 'kroger' ? (
               <img 
                 src={krogerLogo} 
+                alt=""
+                className="h-64 w-auto"
+              />
+            ) : retailerId === 'heb' ? (
+              <img 
+                src={hebLogo} 
                 alt=""
                 className="h-64 w-auto"
               />

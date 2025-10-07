@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useRetailer } from '@/contexts/RetailerContext';
 import { Home, ShoppingCart, Ticket, User, List } from 'lucide-react';
 import krogerLogo from "@/assets/kroger-logo.png";
+import hebLogo from "@/assets/heb-logo.png";
 
 interface LayoutProps {
   children: ReactNode;
@@ -41,6 +42,12 @@ const Layout = ({ children }: LayoutProps) => {
             {retailerId === 'kroger' ? (
               <img 
                 src={krogerLogo} 
+                alt={`${retailer.name} Logo`}
+                className="h-10 w-auto"
+              />
+            ) : retailerId === 'heb' ? (
+              <img 
+                src={hebLogo} 
                 alt={`${retailer.name} Logo`}
                 className="h-10 w-auto"
               />

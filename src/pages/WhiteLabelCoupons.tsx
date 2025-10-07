@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useRetailer } from "@/contexts/RetailerContext";
 import { Coupon } from "@/components/coupon/types";
 import krogerLogo from "@/assets/kroger-logo.png";
+import hebLogo from "@/assets/heb-logo.png";
 
 const Coupons = () => {
   const { toast } = useToast();
@@ -127,6 +128,12 @@ const Coupons = () => {
           {retailerId === 'kroger' ? (
             <img 
               src={krogerLogo} 
+              alt={`${retailer.name} Logo`}
+              className="h-16 w-auto"
+            />
+          ) : retailerId === 'heb' ? (
+            <img 
+              src={hebLogo} 
               alt={`${retailer.name} Logo`}
               className="h-16 w-auto"
             />

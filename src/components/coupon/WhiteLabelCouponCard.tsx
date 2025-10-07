@@ -4,6 +4,7 @@ import { Star, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRetailer } from "@/contexts/RetailerContext";
 import krogerLogo from "@/assets/kroger-logo.png";
+import hebLogo from "@/assets/heb-logo.png";
 
 interface Coupon {
   id: string;
@@ -60,6 +61,14 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
           <div className="absolute top-2 left-2 z-10">
             <img 
               src={krogerLogo} 
+              alt=""
+              className="h-8 w-auto"
+            />
+          </div>
+        ) : retailerId === 'heb' ? (
+          <div className="absolute top-2 left-2 z-10">
+            <img 
+              src={hebLogo} 
               alt=""
               className="h-8 w-auto"
             />
