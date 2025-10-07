@@ -8,7 +8,7 @@ export const hebCoupons: Coupon[] = [
     id: "heb-1",
     title: "$40 off",
     description: "Ninja Flip Toaster Oven & Air Fryer",
-    image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=500&h=500&fit=crop",
+    image: "/lovable-uploads/ninja-toaster.png",
     expiresAt: "2025-10-14",
     category: "Home & Kitchen",
     value: 40.00,
