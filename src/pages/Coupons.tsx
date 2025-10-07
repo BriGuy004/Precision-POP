@@ -6,11 +6,13 @@ import SessionSavingsTracker from "@/components/SessionSavingsTracker";
 import CouponBrowser from "@/components/CouponBrowser";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useRetailer } from "@/contexts/RetailerContext";
 import { Coupon } from "@/components/coupon/types";
 
 const Coupons = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { retailer } = useRetailer();
   const [activeTab, setActiveTab] = useState("discover");
   const [sessionSavings, setSessionSavings] = useState(0);
   const [savedCoupons, setSavedCoupons] = useState<Coupon[]>([]);
@@ -120,11 +122,22 @@ const Coupons = () => {
   return (
     <div className="container mx-auto px-1 py-0 mt-0">
       <div className="flex justify-center mt-0 mb-[2px]">
-        <img 
-          src="/lovable-uploads/90ab9748-bbf9-4c76-bea3-2294d748f78e.png" 
-          alt="H-E-B" 
-          className="h-32" 
-        />
+        <div className="flex items-center gap-3">
+          <div 
+            className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-lg"
+            style={{ backgroundColor: retailer.theme.primary }}
+          >
+            {retailer.shortName.charAt(0)}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: retailer.theme.text }}>
+              {retailer.name}
+            </h1>
+            <p className="text-sm" style={{ color: `${retailer.theme.text}80` }}>
+              {retailer.tagline}
+            </p>
+          </div>
+        </div>
       </div>
       
       {isMobile && (
@@ -138,7 +151,8 @@ const Coupons = () => {
       )}
       
       <motion.div
-        className="p-0 mb-[2px] rounded-lg text-center bg-[#ea384c] text-white"
+        className="p-0 mb-[2px] rounded-lg text-center text-white"
+        style={{ backgroundColor: retailer.theme.primary }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -187,13 +201,23 @@ const Coupons = () => {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-primary text-xs">{coupon.title}</h3>
+                      <h3 
+                        className="font-medium text-xs"
+                        style={{ color: retailer.theme.primary }}
+                      >
+                        {coupon.title}
+                      </h3>
                       <p className="text-xs text-muted-foreground line-clamp-1">{coupon.description}</p>
                       <div className="flex items-center justify-between mt-0.5">
                         <span className="text-xs text-muted-foreground">
                           Expires: {new Date(coupon.expiresAt).toLocaleDateString()}
                         </span>
-                        <span className="font-bold text-green-500 text-xs">${coupon.value.toFixed(2)}</span>
+                        <span 
+                          className="font-bold text-xs"
+                          style={{ color: retailer.theme.success }}
+                        >
+                          ${coupon.value.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </div>
