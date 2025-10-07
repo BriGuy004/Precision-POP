@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useRetailer } from "@/contexts/RetailerContext"; // 🎨 WHITE-LABEL IMPORT
 
 const Index = () => {
   const navigate = useNavigate();
+  const { retailer } = useRetailer(); // 🎨 WHITE-LABEL HOOK
   
   // Handle login
   const handleLogin = () => {
@@ -17,18 +19,21 @@ const Index = () => {
   
   return (
     <div className="container mx-auto px-4 pb-12 pt-5">
-      {/* HEB Logo */}
+      {/* 🎨 WHITE-LABELED LOGO - Dynamic Retailer Badge */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="flex justify-center mb-4"
       >
-        <img 
-          src="/lovable-uploads/10591ab9-a989-4062-9a50-f50702ca53e4.png" 
-          alt="H-E-B Logo" 
-          className="h-40 w-auto"
-        />
+        <div className="flex items-center gap-4">
+          <div 
+            className="w-32 h-32 rounded-2xl flex items-center justify-center text-white font-bold text-5xl shadow-xl"
+            style={{ backgroundColor: retailer.theme.primary }}
+          >
+            {retailer.shortName.charAt(0)}
+          </div>
+        </div>
       </motion.div>
       
       <motion.div
@@ -37,13 +42,14 @@ const Index = () => {
         transition={{ duration: 0.5 }}
         className="text-center mb-8"
       >
+        {/* 🎨 WHITE-LABELED WELCOME TEXT - Dynamic Retailer Name */}
         <motion.h1 
           className="text-3xl font-bold mb-2"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Welcome to H-E-B
+          Welcome to {retailer.name}
           <br />
           Alice!
         </motion.h1>
@@ -53,49 +59,75 @@ const Index = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          Your digital loyalty card for a smarter shopping experience
+          {retailer.tagline}
         </motion.p>
       </motion.div>
       
-      {/* Hero Image */}
+      {/* 🎨 WHITE-LABELED LOYALTY CARD - Dynamic Colors */}
       <motion.div 
         className="max-w-md mx-auto mb-8"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <div className="aspect-[1.586/1] rounded-2xl overflow-hidden glass-card bg-gradient-to-br from-[#ea384c]/90 to-[#ea384c]/60 shadow-lg flex flex-col justify-between p-6 relative">
-          {/* H-E-B Logo Watermark */}
+        <div 
+          className="aspect-[1.586/1] rounded-2xl overflow-hidden glass-card shadow-lg flex flex-col justify-between p-6 relative"
+          style={{
+            background: `linear-gradient(to bottom right, ${retailer.theme.primary}90, ${retailer.theme.primary}60)`,
+          }}
+        >
+          {/* 🎨 WHITE-LABELED WATERMARK - Dynamic Retailer Initial */}
           <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-            <img 
-              src="/lovable-uploads/10591ab9-a989-4062-9a50-f50702ca53e4.png" 
-              alt="H-E-B Logo Watermark" 
-              className="w-2/3 h-auto"
-            />
+            <div 
+              className="text-white font-bold"
+              style={{ fontSize: '10rem' }}
+            >
+              {retailer.shortName.charAt(0)}
+            </div>
           </div>
           
           <div>
-            <h3 className="text-xl font-semibold text-primary-foreground mt-1">Loyalty Card</h3>
+            <h3 className="text-xl font-semibold text-white mt-1">Loyalty Card</h3>
           </div>
           <div>
-            <p className="text-sm text-primary-foreground/70">Cardholder</p>
-            <p className="text-lg font-medium text-primary-foreground">Alice Tillett</p>
-            <p className="text-sm font-medium text-primary-foreground/90 mt-1">•••• •••• •••• 4242</p>
+            <p className="text-sm text-white/70">Cardholder</p>
+            <p className="text-lg font-medium text-white">Alice Tillett</p>
+            <p className="text-sm font-medium text-white/90 mt-1">•••• •••• •••• 4242</p>
           </div>
         </div>
       </motion.div>
       
-      {/* CTAs */}
+      {/* 🎨 WHITE-LABELED BUTTONS - Dynamic Colors */}
       <motion.div 
         className="flex flex-col gap-3 max-w-xs mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <Button onClick={handleLogin} className="w-full bg-[#ea384c] hover:bg-[#ea384c]/90">
+        <Button 
+          onClick={handleLogin} 
+          className="w-full text-white"
+          style={{ 
+            backgroundColor: retailer.theme.primary,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = `${retailer.theme.primary}dd`;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = retailer.theme.primary;
+          }}
+        >
           Log In
         </Button>
-        <Button onClick={handleSignup} variant="outline" className="w-full">
+        <Button 
+          onClick={handleSignup} 
+          variant="outline" 
+          className="w-full"
+          style={{
+            borderColor: retailer.theme.primary,
+            color: retailer.theme.primary,
+          }}
+        >
           Sign Up
         </Button>
       </motion.div>
