@@ -7,7 +7,7 @@ import { personalizationService } from "../services/PersonalizationService";
 import { analyticsService } from "../services/AnalyticsService";
 import { Coupon, CouponSwiperProps } from "./coupon/types";
 import CouponCard from "./coupon/WhiteLabelCouponCard";
-import SwipeControls from "./coupon/SwipeControls";
+import SwipeControls from "./coupon/WhiteLabelSwipeControls";
 import RecoverButton from "./coupon/RecoverButton";
 import SwipeDirectionOverlay from "./coupon/SwipeDirectionOverlay";
 import EmptyState from "./coupon/EmptyState";
