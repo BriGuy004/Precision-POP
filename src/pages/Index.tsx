@@ -2,10 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRetailer } from "@/contexts/RetailerContext"; // 🎨 WHITE-LABEL IMPORT
+import krogerLogo from "@/assets/kroger-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { retailer } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+  const { retailer, retailerId } = useRetailer(); // 🎨 WHITE-LABEL HOOK
   
   // Handle login
   const handleLogin = () => {
@@ -27,12 +28,20 @@ const Index = () => {
         className="flex justify-center mb-4"
       >
         <div className="flex items-center gap-4">
-          <div 
-            className="w-32 h-32 rounded-2xl flex items-center justify-center text-white font-bold text-5xl shadow-xl"
-            style={{ backgroundColor: retailer.theme.primary }}
-          >
-            {retailer.shortName.charAt(0)}
-          </div>
+          {retailerId === 'kroger' ? (
+            <img 
+              src={krogerLogo} 
+              alt={`${retailer.name} Logo`}
+              className="h-32 w-auto"
+            />
+          ) : (
+            <div 
+              className="w-32 h-32 rounded-2xl flex items-center justify-center text-white font-bold text-5xl shadow-xl"
+              style={{ backgroundColor: retailer.theme.primary }}
+            >
+              {retailer.shortName.charAt(0)}
+            </div>
+          )}
         </div>
       </motion.div>
       
@@ -76,14 +85,22 @@ const Index = () => {
             background: `linear-gradient(to bottom right, ${retailer.theme.primary}90, ${retailer.theme.primary}60)`,
           }}
         >
-          {/* 🎨 WHITE-LABELED WATERMARK - Dynamic Retailer Initial */}
+          {/* 🎨 WHITE-LABELED WATERMARK - Dynamic Retailer Logo/Initial */}
           <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
-            <div 
-              className="text-white font-bold"
-              style={{ fontSize: '10rem' }}
-            >
-              {retailer.shortName.charAt(0)}
-            </div>
+            {retailerId === 'kroger' ? (
+              <img 
+                src={krogerLogo} 
+                alt=""
+                className="h-64 w-auto"
+              />
+            ) : (
+              <div 
+                className="text-white font-bold"
+                style={{ fontSize: '10rem' }}
+              >
+                {retailer.shortName.charAt(0)}
+              </div>
+            )}
           </div>
           
           <div>

@@ -8,11 +8,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useRetailer } from "@/contexts/RetailerContext";
 import { Coupon } from "@/components/coupon/types";
+import krogerLogo from "@/assets/kroger-logo.png";
 
 const Coupons = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { retailer } = useRetailer();
+  const { retailer, retailerId } = useRetailer();
   const [activeTab, setActiveTab] = useState("discover");
   const [sessionSavings, setSessionSavings] = useState(0);
   const [savedCoupons, setSavedCoupons] = useState<Coupon[]>([]);
@@ -123,12 +124,20 @@ const Coupons = () => {
     <div className="container mx-auto px-1 py-0 mt-0">
       <div className="flex justify-center mt-0 mb-[2px]">
         <div className="flex items-center gap-3">
-          <div 
-            className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-lg"
-            style={{ backgroundColor: retailer.theme.primary }}
-          >
-            {retailer.shortName.charAt(0)}
-          </div>
+          {retailerId === 'kroger' ? (
+            <img 
+              src={krogerLogo} 
+              alt={`${retailer.name} Logo`}
+              className="h-16 w-auto"
+            />
+          ) : (
+            <div 
+              className="w-16 h-16 rounded-xl flex items-center justify-center text-white font-bold text-3xl shadow-lg"
+              style={{ backgroundColor: retailer.theme.primary }}
+            >
+              {retailer.shortName.charAt(0)}
+            </div>
+          )}
           <div>
             <h1 className="text-2xl font-bold" style={{ color: retailer.theme.text }}>
               {retailer.name}

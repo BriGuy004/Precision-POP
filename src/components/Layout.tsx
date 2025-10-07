@@ -2,13 +2,14 @@ import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useRetailer } from '@/contexts/RetailerContext';
 import { Home, ShoppingCart, Ticket, User, List } from 'lucide-react';
+import krogerLogo from "@/assets/kroger-logo.png";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { retailer } = useRetailer();
+  const { retailer, retailerId } = useRetailer();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -37,11 +38,19 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{
-              backgroundColor: retailer.theme.primary,
-            }}>
-              {retailer.shortName.charAt(0)}
-            </div>
+            {retailerId === 'kroger' ? (
+              <img 
+                src={krogerLogo} 
+                alt={`${retailer.name} Logo`}
+                className="h-10 w-auto"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xl" style={{
+                backgroundColor: retailer.theme.primary,
+              }}>
+                {retailer.shortName.charAt(0)}
+              </div>
+            )}
             <div>
               <h1 className="font-bold text-lg leading-none">{retailer.name}</h1>
               <p className="text-xs opacity-60">{retailer.tagline}</p>

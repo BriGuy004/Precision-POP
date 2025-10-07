@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import SavingsDashboard from "@/components/SavingsDashboard";
+import krogerLogo from "@/assets/kroger-logo.png";
 
 const Profile = () => {
   const { toast } = useToast();
@@ -329,12 +330,20 @@ const Profile = () => {
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center gap-4">
-                      <div 
-                        className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md"
-                        style={{ backgroundColor: config.theme.primary }}
-                      >
-                        {config.shortName.charAt(0)}
-                      </div>
+                      {id === 'kroger' ? (
+                        <img 
+                          src={krogerLogo} 
+                          alt={`${config.name} Logo`}
+                          className="h-12 w-auto"
+                        />
+                      ) : (
+                        <div 
+                          className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md"
+                          style={{ backgroundColor: config.theme.primary }}
+                        >
+                          {config.shortName.charAt(0)}
+                        </div>
+                      )}
                       <div className="text-left">
                         <div className="font-semibold">{config.name}</div>
                         <div className="text-sm text-muted-foreground">{config.tagline}</div>

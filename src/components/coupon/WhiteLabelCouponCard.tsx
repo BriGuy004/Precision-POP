@@ -3,6 +3,7 @@ import React from "react";
 import { Star, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRetailer } from "@/contexts/RetailerContext";
+import krogerLogo from "@/assets/kroger-logo.png";
 
 interface Coupon {
   id: string;
@@ -41,7 +42,7 @@ const getCouponGradient = (category?: string) => {
 };
 
 export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => {
-  const { retailer } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+  const { retailer, retailerId } = useRetailer(); // 🎨 WHITE-LABEL HOOK
 
   return (
     <div 
@@ -55,13 +56,23 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
     >
       <div className="relative h-full flex flex-col rounded-xl overflow-hidden">
         {/* 🎨 WHITE-LABELED LOGO - Dynamic Retailer Branding */}
-        <div className="absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-md" style={{
-          backgroundColor: retailer.theme.primary,
-        }}>
-          <div className="w-6 h-6 flex items-center justify-center text-white font-bold text-xs">
-            {retailer.shortName.charAt(0)}
+        {retailerId === 'kroger' ? (
+          <div className="absolute top-2 left-2 z-10">
+            <img 
+              src={krogerLogo} 
+              alt=""
+              className="h-8 w-auto"
+            />
           </div>
-        </div>
+        ) : (
+          <div className="absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-md" style={{
+            backgroundColor: retailer.theme.primary,
+          }}>
+            <div className="w-6 h-6 flex items-center justify-center text-white font-bold text-xs">
+              {retailer.shortName.charAt(0)}
+            </div>
+          </div>
+        )}
               
         {coupon?.isPersonalized && (
           <div className="absolute top-2 right-2 z-10 bg-yellow-400 p-1 rounded-full flex items-center shadow-md">
