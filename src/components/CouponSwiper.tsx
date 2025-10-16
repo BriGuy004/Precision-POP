@@ -214,7 +214,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
   };
 
   return (
-    <div className="relative w-full max-w-sm mx-auto h-[600px] flex items-center justify-center mt-6 mb-24">
+    <div className="relative w-full max-w-md mx-auto h-[calc(100vh-280px)] min-h-[500px] flex items-center justify-center mt-2 mb-4 px-4">
       {discardedCoupons.length > 0 && (
         <RecoverButton onRecover={handleRecoverLastCoupon} />
       )}
@@ -225,9 +225,11 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         <AnimatePresence>
           <motion.div
             key={currentCoupon?.id}
-            className="absolute rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+            className="absolute rounded-3xl shadow-2xl w-full overflow-hidden"
             style={{ 
-              height: "550px",
+              height: "calc(100vh - 300px)",
+              minHeight: "480px",
+              maxHeight: "650px",
               boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
               x,
               rotate,
@@ -270,14 +272,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         </AnimatePresence>
       )}
       
-      {coupons.length > 0 && (
-        <SwipeControls 
-          onSwipeLeft={() => handleSwipe("left", "button")}
-          onSwipeRight={() => handleSwipe("right", "button")}
-          isPersonalized={currentCoupon?.isPersonalized}
-          isAiGenerated={currentCoupon?.aiGenerated}
-        />
-      )}
+      {/* Swipe-only interface - no button controls */}
 
       {/* Analytics Debug Panel - Remove in production */}
       {process.env.NODE_ENV === 'development' && (
