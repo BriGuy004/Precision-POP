@@ -28,8 +28,9 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
 
   const currentCoupon = coupons[currentIndex];
 
+  // Bumble-style swipe physics
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 0, 200], [-10, 0, 10]);
+  const rotate = useTransform(x, [-200, 0, 200], [-25, 0, 25]); // More dramatic rotation like Bumble
   const bgOpacityLeft = useTransform(x, [-200, -50, 0], [0.8, 0, 0]);
   const bgOpacityRight = useTransform(x, [0, 50, 200], [0, 0, 0.8]);
 
@@ -100,8 +101,23 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
     loadPersonalizedCoupons();
   }, [userId, toast]);
 
+  // Haptic feedback for mobile devices
+  const triggerHaptic = (type: 'light' | 'medium' | 'heavy') => {
+    if ('vibrate' in navigator) {
+      const patterns = {
+        light: 10,
+        medium: 25,
+        heavy: 50
+      };
+      navigator.vibrate(patterns[type]);
+    }
+  };
+
   const handleSwipe = async (swipeDirection: string, method: 'gesture' | 'button' = 'button') => {
     if (coupons.length <= 1) return;
+    
+    // Trigger haptic feedback
+    triggerHaptic('medium');
     
     setDirection(swipeDirection);
     const couponToRemove = currentCoupon;
@@ -161,12 +177,23 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
   };
 
   const handleDragEnd = async (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipeThreshold = 100;
+    // Bumble-style swipe thresholds
+    const SWIPE_THRESHOLD = 100;     // px
+    const VELOCITY_THRESHOLD = 0.5;  // px/ms
     
-    if (info.offset.x > swipeThreshold) {
+    const velocity = Math.abs(info.velocity.x);
+    const offset = info.offset.x;
+    
+    // Swipe right if threshold exceeded or fast velocity
+    if (offset > SWIPE_THRESHOLD || (offset > 50 && velocity > VELOCITY_THRESHOLD * 1000)) {
       await handleSwipe("right", "gesture");
-    } else if (info.offset.x < -swipeThreshold) {
+    } 
+    // Swipe left if threshold exceeded or fast velocity
+    else if (offset < -SWIPE_THRESHOLD || (offset < -50 && velocity > VELOCITY_THRESHOLD * 1000)) {
       await handleSwipe("left", "gesture");
+    } else {
+      // Light haptic if swipe didn't commit
+      triggerHaptic('light');
     }
   };
 
@@ -187,7 +214,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
   };
 
   return (
-    <div className="relative w-full max-w-xs mx-auto h-[50vh] flex items-center justify-center mt-6 mb-24">
+    <div className="relative w-full max-w-sm mx-auto h-[600px] flex items-center justify-center mt-6 mb-24">
       {discardedCoupons.length > 0 && (
         <RecoverButton onRecover={handleRecoverLastCoupon} />
       )}
@@ -198,38 +225,38 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         <AnimatePresence>
           <motion.div
             key={currentCoupon?.id}
-            className="absolute glass-card p-3 rounded-2xl shadow-2xl shadow-black/40 dark:shadow-black/60 w-full max-w-xs"
+            className="absolute rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
             style={{ 
-              height: "400px", 
-              maxHeight: "50vh",
-              boxShadow: "0 -8px 20px -4px rgba(0,0,0,0.2), 0 8px 20px -4px rgba(0,0,0,0.3)",
+              height: "550px",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
               x,
               rotate,
             }}
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ 
               scale: 1, 
               opacity: 1,
-              x: direction === "left" ? -300 : direction === "right" ? 300 : 0,
-              rotate: direction === "left" ? -30 : direction === "right" ? 30 : 0,
+              y: 0,
+              x: direction === "left" ? -400 : direction === "right" ? 400 : 0,
+              rotate: direction === "left" ? -45 : direction === "right" ? 45 : 0,
             }}
             exit={{ 
               scale: 0.8, 
               opacity: 0,
-              transition: { duration: 0.3 }
+              transition: { duration: 0.2 }
             }}
             transition={{ 
               type: "spring", 
-              stiffness: 300, 
-              damping: 20,
-              mass: 0.8
+              stiffness: 400, 
+              damping: 30,
+              mass: 1
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
             onMouseEnter={handleCardHover}
-            whileDrag={{ scale: 1.05 }}
-            dragElastic={0.15}
+            whileDrag={{ scale: 1.05, cursor: 'grabbing' }}
+            dragElastic={0.2}
           >
             <SwipeDirectionOverlay 
               bgOpacityLeft={bgOpacityLeft}

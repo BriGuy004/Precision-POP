@@ -48,90 +48,91 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
   return (
     <div 
       className={cn(
-        "relative glass-card p-3 rounded-xl overflow-hidden shadow-xl",
-        getCouponGradient(coupon?.category),
+        "relative rounded-xl overflow-hidden shadow-xl h-full",
         className
       )}
       data-coupon-id={coupon?.id}
       data-coupon-value={coupon?.value.toFixed(2)}
     >
-      <div className="relative h-full flex flex-col rounded-xl overflow-hidden">
-        {/* 🎨 WHITE-LABELED LOGO - Dynamic Retailer Branding */}
+      {/* BUMBLE-STYLE: Full-height image background */}
+      <div className="relative h-full w-full">
+        <img
+          src={coupon?.image}
+          alt={coupon?.description}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        
+        {/* Dark gradient overlay at bottom (Bumble-style) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        
+        {/* 🎨 WHITE-LABELED LOGO - Top left */}
         {retailerId === 'kroger' ? (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-4 left-4 z-10">
             <img 
               src={krogerLogo} 
               alt=""
-              className="h-8 w-auto"
+              className="h-10 w-auto drop-shadow-lg"
             />
           </div>
         ) : retailerId === 'heb' ? (
-          <div className="absolute top-2 left-2 z-10">
+          <div className="absolute top-4 left-4 z-10">
             <img 
               src={hebLogo} 
               alt=""
-              className="h-8 w-auto"
+              className="h-10 w-auto drop-shadow-lg"
             />
           </div>
         ) : (
-          <div className="absolute top-2 left-2 z-10 p-1.5 rounded-full shadow-md" style={{
+          <div className="absolute top-4 left-4 z-10 p-2 rounded-full shadow-lg" style={{
             backgroundColor: retailer.theme.primary,
           }}>
-            <div className="w-6 h-6 flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-7 h-7 flex items-center justify-center text-white font-bold">
               {retailer.shortName.charAt(0)}
             </div>
           </div>
         )}
-              
+        
+        {/* Personalization badge - Top right */}
         {coupon?.isPersonalized && (
-          <div className="absolute top-2 right-2 z-10 bg-yellow-400 p-1 rounded-full flex items-center shadow-md">
-            <Star className="w-4 h-4 text-yellow-800" fill="currentColor" />
+          <div className="absolute top-4 right-4 z-10 px-3 py-1.5 bg-yellow-400 rounded-full flex items-center gap-1 shadow-lg">
+            <span className="text-xs font-bold text-yellow-900">✨ For You</span>
           </div>
         )}
-              
-        <div className="w-full h-[180px] overflow-hidden rounded-t-lg relative">
-          <img
-            src={coupon?.image}
-            alt={coupon?.description}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        </div>
-              
-        <div className="flex-1 flex flex-col p-4 bg-white/90 rounded-b-lg shadow-inner relative">
-          <div className="mt-3 pr-4">
-            {/* 🎨 WHITE-LABELED TITLE - Uses retailer primary color */}
-            <h3 
-              className="text-lg font-bold"
-              style={{ color: retailer.theme.primary }}
+        
+        {/* BUMBLE-STYLE: Bottom content overlay with white text */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
+          {/* Value badge */}
+          <div className="flex justify-end mb-3">
+            <div 
+              className="text-white px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 text-lg"
+              style={{ backgroundColor: retailer.theme.accent }}
             >
-              {coupon?.title}
-            </h3>
-            <p className="text-sm text-gray-700 font-medium line-clamp-2 mt-1">{coupon?.description}</p>
-                  
-            {coupon?.reason && (
-              <p className="text-xs mt-2 text-yellow-600 font-medium bg-yellow-50 p-1 rounded-lg inline-block">
-                {coupon.reason}
-              </p>
-            )}
-                  
-            <div className="flex justify-between items-center mt-3">
-              {/* 🎨 WHITE-LABELED EXPIRATION - Uses retailer error color */}
-              <div 
-                className="px-2 py-0.5 rounded text-xs font-semibold text-white"
-                style={{ backgroundColor: retailer.theme.error }}
-              >
-                Expires Today
-              </div>
-              {/* 🎨 WHITE-LABELED VALUE - Uses retailer accent color */}
-              <div 
-                className="text-white px-2 py-0.5 rounded-full font-bold shadow-md flex items-center gap-1"
-                style={{ backgroundColor: retailer.theme.accent }}
-              >
-                <Scissors className="w-3 h-3" />
-                <span>${coupon?.value.toFixed(2)}</span>
-              </div>
+              <Scissors className="w-4 h-4" />
+              <span>${coupon?.value.toFixed(2)}</span>
             </div>
+          </div>
+          
+          {/* Title and description - White text on dark overlay */}
+          <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
+            {coupon?.title}
+          </h3>
+          <p className="text-base text-white/90 font-medium line-clamp-2 mb-3 drop-shadow-md">
+            {coupon?.description}
+          </p>
+          
+          {/* Reason for recommendation */}
+          {coupon?.reason && (
+            <p className="text-xs text-yellow-300 font-semibold mb-2 drop-shadow-md">
+              💡 {coupon.reason}
+            </p>
+          )}
+          
+          {/* Expiration */}
+          <div 
+            className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white shadow-md"
+            style={{ backgroundColor: retailer.theme.error }}
+          >
+            Expires Today
           </div>
         </div>
       </div>
