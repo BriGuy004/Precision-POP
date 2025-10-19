@@ -1,10 +1,5 @@
-
 import React from "react";
-import { Star, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRetailer } from "@/contexts/RetailerContext";
-import krogerLogo from "@/assets/kroger-logo.png";
-import hebLogo from "@/assets/heb-logo.png";
 
 interface Coupon {
   id: string;
@@ -23,117 +18,76 @@ interface CouponCardProps {
   className?: string;
 }
 
-const getCouponGradient = (category?: string) => {
-  switch(category?.toLowerCase()) {
-    case "snacks":
-      return "bg-gradient-to-tr from-orange-50 to-amber-100";
-    case "produce":
-      return "bg-gradient-to-tr from-green-50 to-emerald-100";
-    case "beverages":
-      return "bg-gradient-to-tr from-blue-50 to-sky-100";
-    case "bakery":
-      return "bg-gradient-to-tr from-amber-50 to-yellow-100";
-    case "dairy":
-      return "bg-gradient-to-tr from-slate-50 to-slate-100";
-    case "meat":
-      return "bg-gradient-to-tr from-red-50 to-rose-100";
-    default:
-      return "bg-gradient-to-tr from-purple-50 to-violet-100";
-  }
-};
-
 export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => {
-  const { retailer, retailerId } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+  // Clean value display (Disney+ style - no decimals)
+  const displayValue = coupon?.value >= 1 
+    ? `$${Math.round(coupon.value)}` 
+    : `${Math.round(coupon.value * 100)}¢`;
 
   return (
     <div 
       className={cn(
-        "relative rounded-xl overflow-hidden shadow-xl h-full",
+        "relative rounded-2xl overflow-hidden h-full w-full",
+        // Disney+ floating card depth
+        "shadow-2xl shadow-black/60",
         className
       )}
       data-coupon-id={coupon?.id}
       data-coupon-value={coupon?.value.toFixed(2)}
     >
-      {/* BUMBLE-STYLE: Full-height image background */}
-      <div className="relative h-full w-full">
-        <img
-          src={coupon?.image}
-          alt={coupon?.description}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      {/* FULL-BLEED PRODUCT IMAGE */}
+      <img
+        src={coupon?.image}
+        alt={coupon?.title}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      
+      {/* 
+        DISNEY+ GRADIENT - The Secret Sauce!
+        Solid black at bottom → smooth 5-stop fade to transparent
+      */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.95) 0%,
+            rgba(0, 0, 0, 0.85) 20%,
+            rgba(0, 0, 0, 0.6) 40%,
+            rgba(0, 0, 0, 0.3) 60%,
+            transparent 80%
+          )`
+        }}
+      />
+      
+      {/* TEXT OVERLAY - Disney+ poster style */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 pb-8">
+        {/* HERO: Discount Amount (like movie title) */}
+        <div className="flex items-baseline gap-3 mb-2">
+          <h1 className="text-6xl font-black text-white leading-none tracking-tight drop-shadow-2xl">
+            {displayValue}
+          </h1>
+          <span className="text-2xl font-bold text-white/90 uppercase tracking-wide drop-shadow-lg">
+            OFF
+          </span>
+        </div>
         
-        {/* Dark gradient overlay at bottom (Bumble-style) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        {/* Product Name (like movie subtitle) */}
+        <h2 className="text-xl font-semibold text-white/95 leading-snug mb-3 drop-shadow-lg">
+          {coupon?.title}
+        </h2>
         
-        {/* 🎨 WHITE-LABELED LOGO - Top left */}
-        {retailerId === 'kroger' ? (
-          <div className="absolute top-4 left-4 z-10">
-            <img 
-              src={krogerLogo} 
-              alt=""
-              className="h-10 w-auto drop-shadow-lg"
-            />
-          </div>
-        ) : retailerId === 'heb' ? (
-          <div className="absolute top-4 left-4 z-10">
-            <img 
-              src={hebLogo} 
-              alt=""
-              className="h-10 w-auto drop-shadow-lg"
-            />
-          </div>
-        ) : (
-          <div className="absolute top-4 left-4 z-10 p-2 rounded-full shadow-lg" style={{
-            backgroundColor: retailer.theme.primary,
-          }}>
-            <div className="w-7 h-7 flex items-center justify-center text-white font-bold">
-              {retailer.shortName.charAt(0)}
-            </div>
-          </div>
-        )}
-        
-        {/* Personalization badge - Top right */}
-        {coupon?.isPersonalized && (
-          <div className="absolute top-4 right-4 z-10 px-3 py-1.5 bg-yellow-400 rounded-full flex items-center gap-1 shadow-lg">
-            <span className="text-xs font-bold text-yellow-900">✨ For You</span>
-          </div>
-        )}
-        
-        {/* BUMBLE-STYLE: Bottom content overlay with white text */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
-          {/* Value badge */}
-          <div className="flex justify-end mb-3">
-            <div 
-              className="text-white px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 text-lg"
-              style={{ backgroundColor: retailer.theme.accent }}
-            >
-              <Scissors className="w-4 h-4" />
-              <span>${coupon?.value.toFixed(2)}</span>
-            </div>
+        {/* Metadata (like "PG 1993" rating badge) */}
+        <div className="flex items-center gap-2">
+          <div className="px-2.5 py-0.5 rounded border border-white/40 text-xs font-semibold text-white/80 backdrop-blur-sm">
+            EXPIRES TODAY
           </div>
           
-          {/* Title and description - White text on dark overlay */}
-          <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
-            {coupon?.title}
-          </h3>
-          <p className="text-base text-white/90 font-medium line-clamp-2 mb-3 drop-shadow-md">
-            {coupon?.description}
-          </p>
-          
-          {/* Reason for recommendation */}
           {coupon?.reason && (
-            <p className="text-xs text-yellow-300 font-semibold mb-2 drop-shadow-md">
-              💡 {coupon.reason}
-            </p>
+            <span className="text-xs font-medium text-white/70">
+              • {coupon.reason}
+            </span>
           )}
-          
-          {/* Expiration */}
-          <div 
-            className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white shadow-md"
-            style={{ backgroundColor: retailer.theme.error }}
-          >
-            Expires Today
-          </div>
         </div>
       </div>
     </div>
