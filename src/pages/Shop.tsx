@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
+import { useRetailer } from "@/contexts/RetailerContext";
 
 // Sample product data with location information
 const products = [
@@ -68,9 +69,10 @@ const products = [
 ];
 
 const Shop = () => {
+  const { retailer } = useRetailer();
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Filter products based on search query
+  const [showFilters, setShowFilters] = useState(false);
+
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -78,41 +80,65 @@ const Shop = () => {
   );
 
   return (
-    <div className="container mx-auto px-1 py-0 mt-0">
-      <div className="flex justify-center mt-0 mb-[2px]">
-        <img 
-          src="/lovable-uploads/90ab9748-bbf9-4c76-bea3-2294d748f78e.png" 
-          alt="H-E-B" 
-          className="h-32" 
-        />
-      </div>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Search bar */}
-        <div className="relative mb-4">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-4 w-4 text-muted-foreground" />
+    <div className="min-h-screen bg-black pb-24">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-white/10">
+        <div className="px-4 py-4">
+          {/* Logo */}
+          <div className="flex justify-center mb-4">
+            <img 
+              src={retailer.logo}
+              alt={retailer.name}
+              className="h-12 w-auto"
+            />
           </div>
-          <Input
-            type="text"
-            placeholder="Search products, categories, or locations..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+
+          {/* Search */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input
+                type="text"
+                placeholder="Search products..."
+                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              className="border-white/10 bg-white/5"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <SlidersHorizontal className="w-4 h-4 text-white" />
+            </Button>
+          </div>
+
+          {/* Store Locator */}
+          <button className="flex items-center gap-2 text-sm text-white/60 mt-3 hover:text-white transition-colors">
+            <MapPin className="w-4 h-4" />
+            <span>Shopping at: Downtown Store</span>
+          </button>
         </div>
-        
-        {/* Products grid */}
-        <div className="mt-4">
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {filteredProducts.map(product => (
+      </div>
+
+      {/* Products Grid */}
+      <div className="px-4 py-4">
+        {filteredProducts.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            {filteredProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
                 <ProductCard 
-                  key={product.id}
                   id={product.id.toString()}
                   name={product.name}
                   price={product.price}
@@ -122,15 +148,15 @@ const Shop = () => {
                   pointsEarned={product.pointsEarned}
                   location={product.location}
                 />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No products found. Try another search term.</p>
-            </div>
-          )}
-        </div>
-      </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-white/40">No products found</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
