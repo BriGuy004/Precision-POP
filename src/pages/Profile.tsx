@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { useRetailer } from "@/contexts/RetailerContext"; // 🎨 WHITE-LABEL IMPORT
+import { useDarkMode } from "@/hooks/use-dark-mode";
 import {
   User,
   Bell,
@@ -22,6 +23,8 @@ import {
   ChevronUp,
   Store,
   Check,
+  Moon,
+  Sun,
 } from "lucide-react";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import SavingsDashboard from "@/components/SavingsDashboard";
@@ -31,6 +34,7 @@ import hebLogo from "@/assets/heb-logo.png";
 const Profile = () => {
   const { toast } = useToast();
   const { retailer, retailerId, switchRetailer, allRetailers } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+  const { isDarkMode, setIsDarkMode } = useDarkMode();
   const [isEditing, setIsEditing] = useState(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
   const [isRetailerSwitcherExpanded, setIsRetailerSwitcherExpanded] = useState(false); // 🎨 NEW STATE
@@ -282,6 +286,34 @@ const Profile = () => {
               >
                 Edit Profile
               </Button>
+            </div>
+          </motion.div>
+
+          {/* Dark Mode Toggle */}
+          <motion.div
+            className="glass-card p-6 rounded-xl mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {isDarkMode ? (
+                  <Moon className="w-5 h-5" style={{ color: retailer.theme.primary }} />
+                ) : (
+                  <Sun className="w-5 h-5" style={{ color: retailer.theme.primary }} />
+                )}
+                <div>
+                  <h3 className="font-semibold">Dark Mode</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Make coupons stand out with dark theme
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={isDarkMode}
+                onCheckedChange={setIsDarkMode}
+              />
             </div>
           </motion.div>
           
