@@ -113,7 +113,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
       setCoupons(prev => prev.filter((_, i) => i !== currentIndex));
       setDirection(null);
       x.set(0);
-    }, 200);
+    }, 350);
   };
 
   const handleDragEnd = async (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
