@@ -27,15 +27,9 @@ const Layout = ({ children }: LayoutProps) => {
   const showNav = location.pathname !== '/login';
 
   return (
-    <div className="min-h-screen flex flex-col" style={{
-      backgroundColor: retailer.theme.background,
-      color: retailer.theme.text,
-    }}>
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b shadow-sm" style={{
-        backgroundColor: retailer.theme.background,
-        borderBottomColor: `${retailer.theme.primary}20`,
-      }}>
+      <header className="sticky top-0 z-50 w-full border-b shadow-sm bg-background">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
@@ -93,10 +87,7 @@ const Layout = ({ children }: LayoutProps) => {
 
       {/* Mobile Bottom Navigation */}
       {showNav && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t shadow-lg" style={{
-          backgroundColor: retailer.theme.background,
-          borderTopColor: `${retailer.theme.primary}20`,
-        }}>
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t shadow-lg bg-background">
           <div className="flex justify-around items-center h-16">
             {navItems.map((item) => (
               <Link

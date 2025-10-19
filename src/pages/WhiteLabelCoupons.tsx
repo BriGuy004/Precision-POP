@@ -67,7 +67,7 @@ const Coupons = () => {
   };
 
   return (
-    <div className="container mx-auto px-1 py-0 mt-0">
+    <div className="container mx-auto px-1 py-0 mt-0 min-h-screen bg-background">
       <div className="flex justify-center mt-0 mb-[2px]">
         <div className="flex items-center gap-3">
           {retailerId === 'kroger' ? (
