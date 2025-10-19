@@ -52,11 +52,6 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
           }));
           
           setCoupons(prev => [...prev, ...newCoupons]);
-          
-          toast({
-            title: "Personalized Offers",
-            description: `${newCoupons.length} personalized coupons added!`,
-          });
         }
       } catch (error) {
         console.error("Error loading personalized coupons:", error);
