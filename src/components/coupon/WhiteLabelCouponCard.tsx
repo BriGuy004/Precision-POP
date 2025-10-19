@@ -74,7 +74,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
         
         {/* Product Name (like movie subtitle) */}
         <h2 className="text-xl font-semibold text-white/95 leading-snug mb-3 drop-shadow-lg">
-          {coupon?.title}
+          {coupon?.description}
         </h2>
         
         {/* Metadata (like "PG 1993" rating badge) */}
