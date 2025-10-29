@@ -1,119 +1,94 @@
 import { motion } from "framer-motion";
-import { Zap, TrendingUp, Gift, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRetailer } from "@/contexts/RetailerContext";
-import SavingsDashboard from "@/components/SavingsDashboard";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const navigate = useNavigate();
   const { retailer } = useRetailer();
 
-  const quickActions = [
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Today's Deals",
-      subtitle: "17 new coupons",
-      color: "from-yellow-500 to-orange-500",
-      action: () => navigate("/coupons")
-    },
-    {
-      icon: <Gift className="w-6 h-6" />,
-      title: "Weekly Rewards",
-      subtitle: "+250 points",
-      color: "from-purple-500 to-pink-500",
-      action: () => navigate("/profile")
-    },
-    {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: "Smart List",
-      subtitle: "8 items",
-      color: "from-green-500 to-emerald-500",
-      action: () => navigate("/list")
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Shop Now",
-      subtitle: "Browse all",
-      color: "from-blue-500 to-cyan-500",
-      action: () => navigate("/shop")
-    }
-  ];
+  // Mock data - would come from auth/database
+  const customerName = "Alice";
+  const weekSavings = 47.50;
 
   return (
-    <div className="min-h-screen bg-black pb-24">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden pb-6">
-        {/* Gradient background */}
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            background: `radial-gradient(circle at top right, ${retailer.theme.primary}, transparent 70%)`
-          }}
-        />
-        
-        <div className="relative z-10 px-4 pt-8">
-          {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <img 
-              src={retailer.logo}
-              alt={retailer.name}
-              className="h-16 w-auto drop-shadow-2xl"
-            />
-          </div>
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 pb-24">
+      {/* Subtle gradient background */}
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          background: `radial-gradient(circle at top center, ${retailer.theme.primary}, transparent 60%)`
+        }}
+      />
 
-          {/* Greeting */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
+      <div className="relative z-10 max-w-md w-full">
+        {/* Logo */}
+        <motion.div 
+          className="flex justify-center mb-12"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <img 
+            src={retailer.logo}
+            alt={retailer.name}
+            className="h-20 w-auto drop-shadow-2xl"
+          />
+        </motion.div>
+
+        {/* Welcome Message */}
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-black text-white mb-4">
+            Welcome Back, {customerName}! 👋
+          </h1>
+          <p className="text-xl text-white/60">
+            You've saved{" "}
+            <span 
+              className="font-bold"
+              style={{ color: retailer.theme.accent }}
+            >
+              ${weekSavings.toFixed(2)}
+            </span>{" "}
+            this week
+          </p>
+        </motion.div>
+
+        {/* Primary CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <Button 
+            size="lg" 
+            className="w-full text-lg py-7 rounded-2xl shadow-2xl hover:shadow-xl transition-all group"
+            style={{
+              background: `linear-gradient(135deg, ${retailer.theme.primary}, ${retailer.theme.secondary})`
+            }}
+            onClick={() => navigate("/coupons")}
           >
-            <h1 className="text-3xl font-black text-white mb-2">
-              Welcome Back, Alice!
-            </h1>
-            <p className="text-white/60">
-              You've saved $47.50 this week 🎉
-            </p>
-          </motion.div>
+            Start Shopping
+            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </motion.div>
 
-          {/* Quick Actions Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            {quickActions.map((action, index) => (
-              <motion.button
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={action.action}
-                className="relative overflow-hidden rounded-2xl p-4 text-left group"
-              >
-                {/* Gradient background */}
-                <div 
-                  className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-90 group-hover:opacity-100 transition-opacity`}
-                />
-                
-                {/* Content */}
-                <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 text-white">
-                    {action.icon}
-                  </div>
-                  <h3 className="font-bold text-white mb-1">
-                    {action.title}
-                  </h3>
-                  <p className="text-xs text-white/80">
-                    {action.subtitle}
-                  </p>
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Savings Dashboard */}
-      <div className="px-4">
-        <SavingsDashboard />
+        {/* Bottom hint */}
+        <motion.div 
+          className="text-center mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          <p className="text-sm text-white/40">
+            Tap the profile icon to see your full savings
+          </p>
+        </motion.div>
       </div>
     </div>
   );
