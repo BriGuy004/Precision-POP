@@ -209,19 +209,21 @@ const GroceryAdmin = () => {
 
       if (error) {
         toast.error(`Database error: ${error.message}`);
+        setIsSaving(false);
         return;
       }
 
-      // Refresh brands first, then close the dialog
-      await refreshBrands();
-      
-      toast.success("Grocery brand updated successfully!");
+      // Close dialog first
       setEditingBrandId(null);
       setEditedBrand(null);
+      setIsSaving(false);
+      
+      // Then refresh and show success
+      await refreshBrands();
+      toast.success("Grocery brand updated successfully!");
     } catch (err: any) {
       console.error('Update error:', err);
       toast.error(`Unexpected error: ${err.message}`);
-    } finally {
       setIsSaving(false);
     }
   };
