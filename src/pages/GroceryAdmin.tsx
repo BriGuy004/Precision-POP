@@ -440,26 +440,40 @@ const GroceryAdmin = () => {
             </SheetHeader>
             <div className="mt-6 space-y-6">
               {editedBrand && (
-                <GroceryBrandForm
-                  brand={editedBrand}
-                  onChange={(updates) => {
-                    setEditedBrand(prev => {
-                      if (!prev) return prev;
-                      return { ...prev, ...updates };
-                    });
-                    const fieldKey = Object.keys(updates)[0];
-                    if (fieldKey) {
-                      setFormErrors(prev => {
-                        const next = { ...prev };
-                        delete next[fieldKey];
-                        return next;
+                <>
+                  {editedBrand.logo_url && (
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-400 mb-2">Current Logo Preview:</p>
+                      <div className="flex items-center justify-center p-6 bg-gray-700 rounded-lg border border-gray-600">
+                        <img 
+                          src={editedBrand.logo_url} 
+                          alt={`${editedBrand.name} logo`}
+                          className="h-20 object-contain"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <GroceryBrandForm
+                    brand={editedBrand}
+                    onChange={(updates) => {
+                      setEditedBrand(prev => {
+                        if (!prev) return prev;
+                        return { ...prev, ...updates };
                       });
-                    }
-                  }}
-                  onImageUpload={handleImageUpload}
-                  isEdit={true}
-                  errors={formErrors}
-                />
+                      const fieldKey = Object.keys(updates)[0];
+                      if (fieldKey) {
+                        setFormErrors(prev => {
+                          const next = { ...prev };
+                          delete next[fieldKey];
+                          return next;
+                        });
+                      }
+                    }}
+                    onImageUpload={handleImageUpload}
+                    isEdit={true}
+                    errors={formErrors}
+                  />
+                </>
               )}
               <div className="flex gap-4">
                 <Button onClick={handleSaveEdit} className="bg-green-600 hover:bg-green-700" disabled={isSaving}>
