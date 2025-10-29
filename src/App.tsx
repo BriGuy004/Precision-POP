@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
-import { RetailerProvider } from "./contexts/RetailerContext";
+import { BrandProvider } from "./contexts/BrandContext";
 import Layout from "./components/Layout";
 import LoadingScreen from "./components/LoadingScreen";
 
@@ -17,13 +17,14 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Coupons = lazy(() => import("./pages/WhiteLabelCoupons"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ShoppingList = lazy(() => import("./pages/ShoppingList"));
+const GroceryAdmin = lazy(() => import("./pages/GroceryAdmin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <RetailerProvider>
+    <BrandProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -37,13 +38,14 @@ const App = () => (
                 <Route path="/coupons" element={<Coupons />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shopping-list" element={<ShoppingList />} />
+                <Route path="/admin/grocery" element={<GroceryAdmin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </Layout>
         </BrowserRouter>
       </TooltipProvider>
-    </RetailerProvider>
+    </BrandProvider>
   </QueryClientProvider>
 );
 

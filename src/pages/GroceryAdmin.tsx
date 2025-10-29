@@ -1,0 +1,531 @@
+import { useBrand } from "@/contexts/BrandContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { CheckCircle2, Plus, Trash2, Loader2, Save } from "lucide-react";
+import { toast } from "sonner";
+import { useState, useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { GroceryBrandForm } from "@/components/GroceryBrandForm";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+
+interface Retailer {
+  id?: string;
+  retailer_id: string;
+  name: string;
+  logo_url: string;
+  hero_image_url: string;
+  primary_color: string;
+  accent_color: string;
+  city?: string;
+  state?: string;
+  website?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+const GroceryAdmin = () => {
+  const { currentBrand, allBrands, setActiveBrand, isLoading, isSwitchingBrand, refreshBrands } = useBrand();
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [editingBrandId, setEditingBrandId] = useState<string | null>(null);
+  const [editedBrand, setEditedBrand] = useState<Retailer | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [newBrand, setNewBrand] = useState<Omit<Retailer, 'id'>>({
+    retailer_id: "",
+    name: "",
+    logo_url: "",
+    hero_image_url: "",
+    primary_color: "142 71% 45%",
+    accent_color: "25 95% 53%",
+    city: "",
+    state: "",
+    website: "",
+    description: ""
+  });
+
+  const filteredBrands = useMemo(() => {
+    return allBrands
+      .filter(brand =>
+        searchTerm === "" ||
+        brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.retailer_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.state?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [allBrands, searchTerm]);
+
+  const validateBrand = (brand: Partial<Retailer>): Record<string, string> => {
+    const errors: Record<string, string> = {};
+    
+    if (!brand.retailer_id) {
+      errors.retailer_id = "Retailer ID is required";
+    } else if (!/^[a-z0-9-]+$/.test(brand.retailer_id)) {
+      errors.retailer_id = "Must be lowercase alphanumeric with hyphens";
+    }
+    
+    if (!brand.name || brand.name.length < 2) {
+      errors.name = "Name must be at least 2 characters";
+    }
+    
+    if (brand.website && !brand.website.startsWith('http')) {
+      errors.website = "Must start with http:// or https://";
+    }
+    
+    if (!brand.logo_url) errors.logo_url = "Logo is required";
+    if (!brand.hero_image_url) errors.hero_image_url = "Hero image is required";
+    
+    return errors;
+  };
+
+  const handleBrandSwitch = async (retailerId: string) => {
+    await setActiveBrand(retailerId);
+  };
+
+  const handleImageUpload = async (
+    file: File, 
+    field: 'logo_url' | 'hero_image_url',
+    retailerId: string
+  ): Promise<string | null> => {
+    try {
+      if (!retailerId) {
+        toast.error("Please enter a Retailer ID first");
+        return null;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${retailerId}-${field}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('brand-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('brand-images')
+        .getPublicUrl(filePath);
+
+      toast.success(`${field.replace('_', ' ')} uploaded successfully!`);
+      return publicUrl;
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error(`Upload failed: ${error.message}`);
+      return null;
+    }
+  };
+
+  const handleAddBrand = async () => {
+    const errors = validateBrand(newBrand);
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error("Please fix the errors before saving");
+      return;
+    }
+    
+    setFormErrors({});
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('retailers')
+        .insert([newBrand]);
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.error("A retailer with this ID already exists");
+        } else {
+          toast.error(`Database error: ${error.message}`);
+        }
+        return;
+      }
+
+      toast.success("Grocery brand added successfully!");
+      setIsAddingBrand(false);
+      setNewBrand({
+        retailer_id: "",
+        name: "",
+        logo_url: "",
+        hero_image_url: "",
+        primary_color: "142 71% 45%",
+        accent_color: "25 95% 53%",
+        city: "",
+        state: "",
+        website: "",
+        description: ""
+      });
+      
+      await refreshBrands();
+    } catch (err: any) {
+      console.error('Add brand error:', err);
+      toast.error(`Unexpected error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditBrand = (brand: any) => {
+    setEditingBrandId(brand.id || null);
+    setEditedBrand({ ...brand });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedBrand) return;
+
+    const errors = validateBrand(editedBrand);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error("Please fix the errors before saving");
+      return;
+    }
+    
+    setFormErrors({});
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('retailers')
+        .update({
+          name: editedBrand.name,
+          logo_url: editedBrand.logo_url,
+          hero_image_url: editedBrand.hero_image_url,
+          primary_color: editedBrand.primary_color,
+          accent_color: editedBrand.accent_color,
+          city: editedBrand.city || '',
+          state: editedBrand.state || '',
+          website: editedBrand.website || '',
+          description: editedBrand.description || ''
+        })
+        .eq('id', editedBrand.id);
+
+      if (error) {
+        toast.error(`Database error: ${error.message}`);
+        return;
+      }
+
+      toast.success("Grocery brand updated successfully!");
+      setEditingBrandId(null);
+      setEditedBrand(null);
+      
+      await refreshBrands();
+    } catch (err: any) {
+      console.error('Update error:', err);
+      toast.error(`Unexpected error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteBrand = async (brandId: string) => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('retailers')
+        .delete()
+        .eq('id', brandId);
+
+      if (error) {
+        toast.error(`Delete failed: ${error.message}`);
+        return;
+      }
+
+      toast.success("Grocery brand deleted successfully!");
+      setDeleteConfirm(null);
+      
+      await refreshBrands();
+    } catch (err: any) {
+      console.error('Delete error:', err);
+      toast.error(`Unexpected error: ${err.message}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white text-xl">Loading grocery brands...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Grocery Brand Management</h1>
+              <p className="text-gray-400">Manage white-label grocery brands, logos, and colors</p>
+            </div>
+            <Button onClick={() => setIsAddingBrand(!isAddingBrand)} className="bg-green-600 hover:bg-green-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Grocer
+            </Button>
+          </div>
+
+          <div className="mb-4">
+            <Input
+              placeholder="Search by name, ID, city, or state..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md bg-gray-800 text-white border-gray-700"
+            />
+            {searchTerm && (
+              <p className="text-sm text-gray-400 mt-2">
+                Found {filteredBrands.length} {filteredBrands.length === 1 ? 'brand' : 'brands'}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {isAddingBrand && (
+          <Card className="mb-8 bg-gray-800 border-green-600">
+            <CardHeader>
+              <CardTitle className="text-white">Add New Grocery Brand</CardTitle>
+              <CardDescription className="text-gray-400">
+                Configure logos, colors, and store information
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <GroceryBrandForm
+                brand={newBrand}
+                onChange={(updates) => {
+                  setNewBrand(prev => ({ ...prev, ...updates }));
+                  const fieldKey = Object.keys(updates)[0];
+                  if (fieldKey) {
+                    setFormErrors(prev => {
+                      const next = { ...prev };
+                      delete next[fieldKey];
+                      return next;
+                    });
+                  }
+                }}
+                onImageUpload={handleImageUpload}
+                errors={formErrors}
+              />
+              <div className="flex gap-4">
+                <Button onClick={handleAddBrand} className="bg-green-600 hover:bg-green-700" disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Grocery Brand
+                    </>
+                  )}
+                </Button>
+                <Button variant="outline" onClick={() => setIsAddingBrand(false)} disabled={isSaving}>
+                  Cancel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBrands.map((brand) => (
+            <Card key={brand.id} className={`bg-gray-800 ${brand.is_active ? "border-green-500" : "border-gray-700"}`}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      {brand.name}
+                      {brand.is_active && (
+                        <Badge className="ml-2 bg-green-600">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Active
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription className="mt-2 text-gray-400">
+                      ID: {brand.retailer_id}
+                    </CardDescription>
+                    {brand.city && brand.state && (
+                      <CardDescription className="text-gray-400">
+                        {brand.city}, {brand.state}
+                      </CardDescription>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="aspect-video bg-gray-700 rounded-lg overflow-hidden">
+                    <img 
+                      src={brand.hero_image_url} 
+                      alt={brand.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-center p-4 bg-gray-700 rounded-lg">
+                    <img 
+                      src={brand.logo_url} 
+                      alt={`${brand.name} logo`}
+                      className="h-12 object-contain"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Primary Color</p>
+                      <div 
+                        className="w-full h-10 rounded border border-gray-600" 
+                        style={{ backgroundColor: `hsl(${brand.primary_color})` }}
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Accent Color</p>
+                      <div 
+                        className="w-full h-10 rounded border border-gray-600" 
+                        style={{ backgroundColor: `hsl(${brand.accent_color})` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => handleEditBrand(brand)} 
+                      variant="outline" 
+                      className="flex-1"
+                    >
+                      Edit
+                    </Button>
+                    {!brand.is_active && (
+                      <Button
+                        onClick={() => handleBrandSwitch(brand.retailer_id)}
+                        disabled={isSwitchingBrand}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        {isSwitchingBrand ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Switching...
+                          </>
+                        ) : (
+                          "Switch"
+                        )}
+                      </Button>
+                    )}
+                    <Button 
+                      variant="destructive" 
+                      size="icon"
+                      onClick={() => setDeleteConfirm(brand.id || null)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Sheet open={!!editingBrandId} onOpenChange={() => setEditingBrandId(null)}>
+          <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gray-800">
+            <SheetHeader>
+              <SheetTitle className="text-white">Edit Grocery Brand</SheetTitle>
+            </SheetHeader>
+            <div className="mt-6 space-y-6">
+              {editedBrand && (
+                <GroceryBrandForm
+                  brand={editedBrand}
+                  onChange={(updates) => {
+                    setEditedBrand(prev => {
+                      if (!prev) return prev;
+                      return { ...prev, ...updates };
+                    });
+                    const fieldKey = Object.keys(updates)[0];
+                    if (fieldKey) {
+                      setFormErrors(prev => {
+                        const next = { ...prev };
+                        delete next[fieldKey];
+                        return next;
+                      });
+                    }
+                  }}
+                  onImageUpload={handleImageUpload}
+                  isEdit={true}
+                  errors={formErrors}
+                />
+              )}
+              <div className="flex gap-4">
+                <Button onClick={handleSaveEdit} className="bg-green-600 hover:bg-green-700" disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </Button>
+                <Button variant="outline" onClick={() => setEditingBrandId(null)} disabled={isSaving}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+          <AlertDialogContent className="bg-gray-800 border-gray-700">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">Delete Grocery Brand?</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                This will permanently delete this grocery brand. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => deleteConfirm && handleDeleteBrand(deleteConfirm)}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  );
+};
+
+export default GroceryAdmin;

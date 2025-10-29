@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      retailers: {
+        Row: {
+          accent_color: string | null
+          city: string | null
+          created_at: string | null
+          description: string | null
+          hero_image_url: string
+          id: string
+          is_active: boolean | null
+          logo_url: string
+          name: string
+          primary_color: string | null
+          retailer_id: string
+          state: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          hero_image_url: string
+          id?: string
+          is_active?: boolean | null
+          logo_url: string
+          name: string
+          primary_color?: string | null
+          retailer_id: string
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          city?: string | null
+          created_at?: string | null
+          description?: string | null
+          hero_image_url?: string
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string
+          name?: string
+          primary_color?: string | null
+          retailer_id?: string
+          state?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

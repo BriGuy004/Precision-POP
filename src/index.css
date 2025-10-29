@@ -5,6 +5,10 @@
 
 @layer base {
   :root {
+    /* Brand colors - dynamically set by BrandContext */
+    --brand-primary: 142 71% 45%;
+    --brand-accent: 25 95% 53%;
+    
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
     
