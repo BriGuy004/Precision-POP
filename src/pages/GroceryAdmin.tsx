@@ -366,13 +366,18 @@ const GroceryAdmin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Logo */}
-                  <div className="flex items-center justify-center p-4 bg-white rounded-lg border-2 border-gray-600">
-                    <img 
-                      src={brand.logo_url} 
-                      alt={`${brand.name} logo`}
-                      className="h-16 object-contain"
-                    />
+                  {/* Primary Color Background with Logo */}
+                  <div 
+                    className="flex items-center justify-center p-8 rounded-lg border-2 border-gray-600"
+                    style={{ backgroundColor: `hsl(${brand.primary_color})` }}
+                  >
+                    <div className="bg-white p-3 rounded-lg shadow-lg">
+                      <img 
+                        src={brand.logo_url} 
+                        alt={`${brand.name} logo`}
+                        className="h-16 object-contain"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex gap-2">

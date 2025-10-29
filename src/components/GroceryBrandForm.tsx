@@ -20,6 +20,7 @@ export const GroceryBrandForm = ({
   isEdit = false 
 }: GroceryBrandFormProps) => {
   const [uploading, setUploading] = useState<string | null>(null);
+  const [isPastingColor, setIsPastingColor] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,6 +93,58 @@ export const GroceryBrandForm = ({
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
   };
 
+  // Extract color from pasted screenshot
+  const handleColorPaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsPastingColor(true);
+
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const blob = items[i].getAsFile();
+        if (!blob) continue;
+
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            
+            // Sample color from center of image
+            const centerX = Math.floor(img.width / 2);
+            const centerY = Math.floor(img.height / 2);
+            const imageData = ctx.getImageData(centerX, centerY, 1, 1).data;
+            
+            // Convert RGB to Hex then to HSL
+            const r = imageData[0];
+            const g = imageData[1];
+            const b = imageData[2];
+            const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+            const hsl = hexToHsl(hex);
+            
+            onChange({ primary_color: hsl });
+          }
+          
+          URL.revokeObjectURL(url);
+          setIsPastingColor(false);
+        };
+        
+        img.src = url;
+        break;
+      }
+    }
+    
+    if (isPastingColor) {
+      setIsPastingColor(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Retailer ID */}
@@ -162,17 +215,43 @@ export const GroceryBrandForm = ({
       {/* Colors */}
       <div>
         <Label className="text-white">Primary Color</Label>
-        <Input
-          type="color"
-          value={hslToHex(brand.primary_color)}
-          onChange={(e) => onChange({ primary_color: hexToHsl(e.target.value) })}
-          className="bg-gray-700 border-gray-600 h-12 cursor-pointer"
-        />
-        <Input
-          value={hslToHex(brand.primary_color)}
-          readOnly
-          className="bg-gray-700 text-white border-gray-600 mt-2 text-center font-mono"
-        />
+        <div className="flex items-center gap-3 mb-2">
+          <Input
+            type="color"
+            value={hslToHex(brand.primary_color)}
+            onChange={(e) => onChange({ primary_color: hexToHsl(e.target.value) })}
+            className="bg-gray-700 border-gray-600 h-12 w-12 cursor-pointer p-1"
+          />
+          <span className="text-white font-mono text-lg">
+            {brand.primary_color.split(' ')[0]} {brand.primary_color.split(' ')[1]} {brand.primary_color.split(' ')[2]}
+          </span>
+        </div>
+        <div>
+          <Label className="text-white text-xs">HSL Value</Label>
+          <Input
+            value={`HSL: ${brand.primary_color}`}
+            readOnly
+            className="bg-gray-700 text-white border-gray-600 mt-1 font-mono text-sm"
+          />
+        </div>
+        
+        {/* Screenshot Paste Area */}
+        <div className="mt-4">
+          <div
+            onPaste={handleColorPaste}
+            className="relative border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-gray-500 transition-colors"
+            style={{ minHeight: '120px' }}
+          >
+            <div className="flex flex-col items-center justify-center gap-2">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p className="text-white font-medium">Click here, then paste your screenshot</p>
+              <p className="text-gray-400 text-xs">Screenshot a solid color from your brand guidelines and paste it here</p>
+              {isPastingColor && <p className="text-blue-400 text-sm">Processing...</p>}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Location */}
