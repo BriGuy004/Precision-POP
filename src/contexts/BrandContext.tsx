@@ -17,6 +17,26 @@ interface Brand {
   is_active: boolean;
 }
 
+// Backward compatibility with old RetailerContext API
+interface RetailerTheme {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  text: string;
+  success: string;
+  error: string;
+}
+
+interface RetailerCompat {
+  id: string;
+  name: string;
+  shortName: string;
+  tagline: string;
+  theme: RetailerTheme;
+  logo: string;
+}
+
 interface BrandContextType {
   currentBrand: Brand | null;
   allBrands: Brand[];
@@ -24,6 +44,11 @@ interface BrandContextType {
   isLoading: boolean;
   isSwitchingBrand: boolean;
   refreshBrands: () => Promise<void>;
+  // Backward compatibility
+  retailer: RetailerCompat;
+  retailerId: string;
+  switchRetailer: (retailerId: string) => Promise<void>;
+  allRetailers: Record<string, RetailerCompat>;
 }
 
 const BrandContext = createContext<BrandContextType | undefined>(undefined);
@@ -33,6 +58,23 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [allBrands, setAllBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSwitchingBrand, setIsSwitchingBrand] = useState(false);
+
+  const brandToRetailerCompat = (brand: Brand): RetailerCompat => ({
+    id: brand.retailer_id,
+    name: brand.name,
+    shortName: brand.name,
+    tagline: brand.description || 'Your Neighborhood Market',
+    theme: {
+      primary: `hsl(${brand.primary_color})`,
+      secondary: `hsl(${brand.accent_color})`,
+      accent: `hsl(${brand.accent_color})`,
+      background: '#FFFFFF',
+      text: '#1a1a1a',
+      success: '#10b981',
+      error: '#ef4444',
+    },
+    logo: brand.logo_url,
+  });
 
   const fetchBrands = async () => {
     try {
@@ -114,6 +156,29 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     fetchBrands();
   }, []);
 
+  // Create backward-compatible retailer objects
+  const retailer = currentBrand ? brandToRetailerCompat(currentBrand) : {
+    id: 'demo',
+    name: 'Demo Grocers',
+    shortName: 'Demo',
+    tagline: 'Your Neighborhood Market',
+    theme: {
+      primary: 'hsl(142 71% 45%)',
+      secondary: 'hsl(25 95% 53%)',
+      accent: 'hsl(25 95% 53%)',
+      background: '#FFFFFF',
+      text: '#1a1a1a',
+      success: '#10b981',
+      error: '#ef4444',
+    },
+    logo: '',
+  };
+
+  const allRetailers = allBrands.reduce((acc, brand) => {
+    acc[brand.retailer_id] = brandToRetailerCompat(brand);
+    return acc;
+  }, {} as Record<string, RetailerCompat>);
+
   return (
     <BrandContext.Provider
       value={{
@@ -123,6 +188,11 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         isLoading,
         isSwitchingBrand,
         refreshBrands,
+        // Backward compatibility
+        retailer,
+        retailerId: currentBrand?.retailer_id || 'demo',
+        switchRetailer: setActiveBrand,
+        allRetailers,
       }}
     >
       {children}
@@ -137,3 +207,6 @@ export const useBrand = () => {
   }
   return context;
 };
+
+// Backward compatibility export
+export const useRetailer = useBrand;
