@@ -212,11 +212,12 @@ const GroceryAdmin = () => {
         return;
       }
 
+      // Refresh brands first, then close the dialog
+      await refreshBrands();
+      
       toast.success("Grocery brand updated successfully!");
       setEditingBrandId(null);
       setEditedBrand(null);
-      
-      await refreshBrands();
     } catch (err: any) {
       console.error('Update error:', err);
       toast.error(`Unexpected error: ${err.message}`);
