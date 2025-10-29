@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useRetailer } from '@/contexts/RetailerContext';
+import { useRetailer } from '@/contexts/BrandContext';
 import { Home, ShoppingCart, Ticket, User, List } from 'lucide-react';
 import krogerLogo from "@/assets/kroger-logo.png";
 import hebLogo from "@/assets/heb-logo.png";

@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 
 // Sample product data with location information
 const products = [

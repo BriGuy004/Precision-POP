@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { X, Heart, Sparkles } from "lucide-react";
 import { MotionValue } from "framer-motion";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 
 interface SwipeDirectionOverlayProps {
   bgOpacityLeft: MotionValue<number>;

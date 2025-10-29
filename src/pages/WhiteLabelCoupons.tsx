@@ -6,7 +6,7 @@ import SessionSavingsTracker from "@/components/WhiteLabelSessionSavingsTracker"
 import CouponBrowser from "@/components/CouponBrowser";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 import { Coupon } from "@/components/coupon/types";
 import krogerLogo from "@/assets/kroger-logo.png";
 import hebLogo from "@/assets/heb-logo.png";

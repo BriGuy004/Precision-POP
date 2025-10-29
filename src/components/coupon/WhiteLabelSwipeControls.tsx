@@ -1,7 +1,7 @@
 
 import { X, Check, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 
 interface SwipeControlsProps {
   onSwipeLeft: () => void;

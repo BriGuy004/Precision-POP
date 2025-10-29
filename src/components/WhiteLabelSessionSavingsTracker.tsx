@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion";
 import { DollarSign, Sparkles } from "lucide-react";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 
 interface SessionSavingsTrackerProps {
   savedAmount: number;

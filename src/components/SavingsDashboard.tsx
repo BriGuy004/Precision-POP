@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Calendar, Zap, ShoppingBag, Award, Target, Trophy } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 
 interface SavingsData {
   totalSaved: number;

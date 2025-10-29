@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
 import { ShoppingCart, Undo2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useRetailer } from "@/contexts/RetailerContext";
+import { useRetailer } from "@/contexts/BrandContext";
 import { personalizationService } from "../services/PersonalizationService";
 import { analyticsService } from "../services/AnalyticsService";
 import { Coupon, CouponSwiperProps } from "./coupon/types";
