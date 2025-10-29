@@ -25,13 +25,12 @@ interface Retailer {
   retailer_id: string;
   name: string;
   logo_url: string;
-  hero_image_url: string;
   primary_color: string;
   accent_color: string;
   city?: string;
   state?: string;
   website?: string;
-  description?: string;
+  tagline?: string;
   is_active?: boolean;
 }
 
@@ -49,13 +48,12 @@ const GroceryAdmin = () => {
     retailer_id: "",
     name: "",
     logo_url: "",
-    hero_image_url: "",
     primary_color: "142 71% 45%",
     accent_color: "25 95% 53%",
     city: "",
     state: "",
     website: "",
-    description: ""
+    tagline: ""
   });
 
   const filteredBrands = useMemo(() => {
@@ -88,7 +86,6 @@ const GroceryAdmin = () => {
     }
     
     if (!brand.logo_url) errors.logo_url = "Logo is required";
-    if (!brand.hero_image_url) errors.hero_image_url = "Hero image is required";
     
     return errors;
   };
@@ -99,7 +96,7 @@ const GroceryAdmin = () => {
 
   const handleImageUpload = async (
     file: File, 
-    field: 'logo_url' | 'hero_image_url',
+    field: 'logo_url',
     retailerId: string
   ): Promise<string | null> => {
     try {
@@ -165,13 +162,12 @@ const GroceryAdmin = () => {
         retailer_id: "",
         name: "",
         logo_url: "",
-        hero_image_url: "",
         primary_color: "142 71% 45%",
         accent_color: "25 95% 53%",
         city: "",
         state: "",
         website: "",
-        description: ""
+        tagline: ""
       });
       
       await refreshBrands();
@@ -206,13 +202,12 @@ const GroceryAdmin = () => {
         .update({
           name: editedBrand.name,
           logo_url: editedBrand.logo_url,
-          hero_image_url: editedBrand.hero_image_url,
           primary_color: editedBrand.primary_color,
           accent_color: editedBrand.accent_color,
           city: editedBrand.city || '',
           state: editedBrand.state || '',
           website: editedBrand.website || '',
-          description: editedBrand.description || ''
+          tagline: editedBrand.tagline || ''
         })
         .eq('id', editedBrand.id);
 
@@ -375,19 +370,11 @@ const GroceryAdmin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="aspect-video bg-gray-700 rounded-lg overflow-hidden">
-                    <img 
-                      src={brand.hero_image_url} 
-                      alt={brand.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
                   <div className="flex items-center justify-center p-4 bg-gray-700 rounded-lg">
                     <img 
                       src={brand.logo_url} 
                       alt={`${brand.name} logo`}
-                      className="h-12 object-contain"
+                      className="h-16 object-contain"
                     />
                   </div>
 

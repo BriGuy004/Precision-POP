@@ -7,13 +7,12 @@ interface Brand {
   retailer_id: string;
   name: string;
   logo_url: string;
-  hero_image_url: string;
   primary_color: string;
   accent_color: string;
   city?: string;
   state?: string;
   website?: string;
-  description?: string;
+  tagline?: string;
   is_active: boolean;
 }
 
@@ -63,7 +62,7 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     id: brand.retailer_id,
     name: brand.name,
     shortName: brand.name,
-    tagline: brand.description || 'Your Neighborhood Market',
+    tagline: brand.tagline || 'Your Neighborhood Market',
     theme: {
       primary: `hsl(${brand.primary_color})`,
       secondary: `hsl(${brand.accent_color})`,
@@ -90,13 +89,12 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         retailer_id: retailer.retailer_id,
         name: retailer.name,
         logo_url: retailer.logo_url,
-        hero_image_url: retailer.hero_image_url,
         primary_color: retailer.primary_color || '142 71% 45%',
         accent_color: retailer.accent_color || '25 95% 53%',
         city: retailer.city,
         state: retailer.state,
         website: retailer.website,
-        description: retailer.description,
+        tagline: retailer.tagline,
         is_active: retailer.is_active || false,
       }));
 
