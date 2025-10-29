@@ -7,6 +7,7 @@ interface Brand {
   retailer_id: string;
   name: string;
   logo_url: string;
+  hero_image_url?: string;
   primary_color: string;
   accent_color: string;
   city?: string;
@@ -89,6 +90,7 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         retailer_id: retailer.retailer_id,
         name: retailer.name,
         logo_url: retailer.logo_url,
+        hero_image_url: retailer.hero_image_url,
         primary_color: retailer.primary_color || '142 71% 45%',
         accent_color: retailer.accent_color || '25 95% 53%',
         city: retailer.city,

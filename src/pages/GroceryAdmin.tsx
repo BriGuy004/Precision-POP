@@ -25,6 +25,7 @@ interface Retailer {
   retailer_id: string;
   name: string;
   logo_url: string;
+  hero_image_url?: string;
   primary_color: string;
   accent_color: string;
   city?: string;
@@ -48,6 +49,7 @@ const GroceryAdmin = () => {
     retailer_id: "",
     name: "",
     logo_url: "",
+    hero_image_url: "",
     primary_color: "142 71% 45%",
     accent_color: "25 95% 53%",
     city: "",
@@ -86,6 +88,7 @@ const GroceryAdmin = () => {
     }
     
     if (!brand.logo_url) errors.logo_url = "Logo is required";
+    if (!brand.hero_image_url) errors.hero_image_url = "Hero image is required";
     
     return errors;
   };
@@ -96,7 +99,7 @@ const GroceryAdmin = () => {
 
   const handleImageUpload = async (
     file: File, 
-    field: 'logo_url',
+    field: 'logo_url' | 'hero_image_url',
     retailerId: string
   ): Promise<string | null> => {
     try {
@@ -162,6 +165,7 @@ const GroceryAdmin = () => {
         retailer_id: "",
         name: "",
         logo_url: "",
+        hero_image_url: "",
         primary_color: "142 71% 45%",
         accent_color: "25 95% 53%",
         city: "",
@@ -202,6 +206,7 @@ const GroceryAdmin = () => {
         .update({
           name: editedBrand.name,
           logo_url: editedBrand.logo_url,
+          hero_image_url: editedBrand.hero_image_url || '',
           primary_color: editedBrand.primary_color,
           accent_color: editedBrand.accent_color,
           city: editedBrand.city || '',
@@ -370,7 +375,19 @@ const GroceryAdmin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center p-4 bg-gray-700 rounded-lg">
+                  {/* Hero Image */}
+                  {brand.hero_image_url && (
+                    <div className="aspect-video bg-gray-700 rounded-lg overflow-hidden">
+                      <img 
+                        src={brand.hero_image_url} 
+                        alt={brand.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Logo */}
+                  <div className="flex items-center justify-center p-4 bg-white rounded-lg border-2 border-gray-600">
                     <img 
                       src={brand.logo_url} 
                       alt={`${brand.name} logo`}
@@ -378,21 +395,13 @@ const GroceryAdmin = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <p className="text-xs text-gray-400 mb-1">Primary Color</p>
-                      <div 
-                        className="w-full h-10 rounded border border-gray-600" 
-                        style={{ backgroundColor: `hsl(${brand.primary_color})` }}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400 mb-1">Accent Color</p>
-                      <div 
-                        className="w-full h-10 rounded border border-gray-600" 
-                        style={{ backgroundColor: `hsl(${brand.accent_color})` }}
-                      />
-                    </div>
+                  {/* Accent Color Display */}
+                  <div>
+                    <p className="text-xs text-gray-400 mb-1">Accent Color</p>
+                    <div 
+                      className="w-full h-10 rounded border border-gray-600" 
+                      style={{ backgroundColor: `hsl(${brand.accent_color})` }}
+                    />
                   </div>
 
                   <div className="flex gap-2">

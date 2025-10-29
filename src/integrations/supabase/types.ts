@@ -19,6 +19,7 @@ export type Database = {
           accent_color: string | null
           city: string | null
           created_at: string | null
+          hero_image_url: string | null
           id: string
           is_active: boolean | null
           logo_url: string
@@ -34,6 +35,7 @@ export type Database = {
           accent_color?: string | null
           city?: string | null
           created_at?: string | null
+          hero_image_url?: string | null
           id?: string
           is_active?: boolean | null
           logo_url: string
@@ -49,6 +51,7 @@ export type Database = {
           accent_color?: string | null
           city?: string | null
           created_at?: string | null
+          hero_image_url?: string | null
           id?: string
           is_active?: boolean | null
           logo_url?: string

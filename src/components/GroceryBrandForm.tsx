@@ -7,7 +7,7 @@ import { useState } from "react";
 interface GroceryBrandFormProps {
   brand: any;
   onChange: (updates: any) => void;
-  onImageUpload: (file: File, field: 'logo_url', retailerId: string) => Promise<string | null>;
+  onImageUpload: (file: File, field: 'logo_url' | 'hero_image_url', retailerId: string) => Promise<string | null>;
   errors?: Record<string, string>;
   isEdit?: boolean;
 }
@@ -21,7 +21,7 @@ export const GroceryBrandForm = ({
 }: GroceryBrandFormProps) => {
   const [uploading, setUploading] = useState<string | null>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'hero_image_url') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -30,10 +30,10 @@ export const GroceryBrandForm = ({
       return;
     }
 
-    setUploading('logo_url');
-    const url = await onImageUpload(file, 'logo_url', brand.retailer_id);
+    setUploading(field);
+    const url = await onImageUpload(file, field, brand.retailer_id);
     if (url) {
-      onChange({ logo_url: url });
+      onChange({ [field]: url });
     }
     setUploading(null);
   };
@@ -120,29 +120,69 @@ export const GroceryBrandForm = ({
         {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
       </div>
 
-      {/* Logo Upload */}
+      {/* Hero Image Upload */}
       <div>
-        <Label className="text-white">Logo Image *</Label>
-        {brand.logo_url ? (
+        <Label className="text-white">Hero/Background Image *</Label>
+        <p className="text-xs text-gray-400 mb-2">Large background image for the card</p>
+        {brand.hero_image_url ? (
           <div className="space-y-2">
-            <div className="flex items-center gap-4 p-4 bg-gray-700 rounded border border-gray-600">
-              <img src={brand.logo_url} alt="Logo" className="h-16 object-contain" />
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onChange({ logo_url: '' })}
-              >
-                <X className="w-4 h-4 mr-1" />
-                Remove
-              </Button>
+            <div className="aspect-video bg-gray-700 rounded overflow-hidden border border-gray-600">
+              <img src={brand.hero_image_url} alt="Hero" className="w-full h-full object-cover" />
             </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onChange({ hero_image_url: '' })}
+            >
+              <X className="w-4 h-4 mr-1" />
+              Remove
+            </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <Input
               type="file"
               accept="image/*"
-              onChange={handleFileUpload}
+              onChange={(e) => handleFileUpload(e, 'hero_image_url')}
+              disabled={uploading === 'hero_image_url'}
+              className="bg-gray-700 text-white border-gray-600"
+            />
+            {uploading === 'hero_image_url' && <span className="text-sm text-gray-400">Uploading...</span>}
+          </div>
+        )}
+        {errors.hero_image_url && <p className="text-red-400 text-sm mt-1">{errors.hero_image_url}</p>}
+      </div>
+
+      {/* Logo Upload */}
+      <div>
+        <Label className="text-white">Logo Image *</Label>
+        <p className="text-xs text-gray-400 mb-2">Square logo that appears on the card</p>
+        {brand.logo_url ? (
+          <div className="space-y-2">
+            <p className="text-sm text-gray-400">Logo URL</p>
+            <Input
+              value={brand.logo_url}
+              readOnly
+              className="bg-gray-700 text-white border-gray-600 text-xs"
+            />
+            <div className="flex items-center gap-4 p-4 bg-white rounded border border-gray-600">
+              <img src={brand.logo_url} alt="Logo" className="h-16 object-contain" />
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onChange({ logo_url: '' })}
+            >
+              <X className="w-4 h-4 mr-1" />
+              Remove
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileUpload(e, 'logo_url')}
               disabled={uploading === 'logo_url'}
               className="bg-gray-700 text-white border-gray-600"
             />
