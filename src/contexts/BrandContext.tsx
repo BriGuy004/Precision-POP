@@ -76,6 +76,9 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const fetchBrands = async () => {
     try {
+      // Small delay to ensure Postgres consistency
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { data, error } = await supabase
         .from('retailers')
         .select('*')
@@ -95,6 +98,8 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         tagline: retailer.tagline,
         is_active: retailer.is_active || false,
       }));
+
+      console.log('✅ Fetched brands:', brands);
 
       setAllBrands(brands);
 

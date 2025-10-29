@@ -193,6 +193,7 @@ const GroceryAdmin = () => {
     
     setFormErrors({});
     setIsSaving(true);
+    
     try {
       const { error } = await supabase
         .from('retailers')
@@ -213,17 +214,20 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Close dialog first
+      // Wait for refresh to complete FIRST
+      await refreshBrands();
+      
+      // Show success
+      toast.success("Grocery brand updated successfully!");
+      
+      // THEN close dialog and clear state
       setEditingBrandId(null);
       setEditedBrand(null);
-      setIsSaving(false);
       
-      // Then refresh and show success
-      await refreshBrands();
-      toast.success("Grocery brand updated successfully!");
     } catch (err: any) {
       console.error('Update error:', err);
       toast.error(`Unexpected error: ${err.message}`);
+    } finally {
       setIsSaving(false);
     }
   };
