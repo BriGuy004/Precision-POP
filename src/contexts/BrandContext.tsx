@@ -7,9 +7,7 @@ interface Brand {
   retailer_id: string;
   name: string;
   logo_url: string;
-  hero_image_url?: string;
   primary_color: string;
-  accent_color: string;
   city?: string;
   state?: string;
   website?: string;
@@ -66,8 +64,8 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     tagline: brand.tagline || 'Your Neighborhood Market',
     theme: {
       primary: `hsl(${brand.primary_color})`,
-      secondary: `hsl(${brand.accent_color})`,
-      accent: `hsl(${brand.accent_color})`,
+      secondary: `hsl(${brand.primary_color})`,
+      accent: `hsl(${brand.primary_color})`,
       background: '#FFFFFF',
       text: '#1a1a1a',
       success: '#10b981',
@@ -90,9 +88,7 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         retailer_id: retailer.retailer_id,
         name: retailer.name,
         logo_url: retailer.logo_url,
-        hero_image_url: retailer.hero_image_url,
         primary_color: retailer.primary_color || '142 71% 45%',
-        accent_color: retailer.accent_color || '25 95% 53%',
         city: retailer.city,
         state: retailer.state,
         website: retailer.website,
@@ -118,7 +114,6 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const applyBrandStyles = (brand: Brand) => {
     const root = document.documentElement;
     root.style.setProperty('--brand-primary', brand.primary_color);
-    root.style.setProperty('--brand-accent', brand.accent_color);
   };
 
   const setActiveBrand = async (retailerId: string) => {

@@ -11,7 +11,6 @@ import { useRetailer } from "@/contexts/BrandContext";
 import { useDarkMode } from "@/hooks/use-dark-mode";
 import {
   User,
-  Bell,
   Settings,
   LogOut,
   ChevronRight,
@@ -21,33 +20,22 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
-  Store,
-  Check,
   Moon,
   Sun,
 } from "lucide-react";
-import LoyaltyCard from "@/components/LoyaltyCard";
 import SavingsDashboard from "@/components/SavingsDashboard";
-import krogerLogo from "@/assets/kroger-logo.png";
-import hebLogo from "@/assets/heb-logo.png";
 
 const Profile = () => {
   const { toast } = useToast();
-  const { retailer, retailerId, switchRetailer, allRetailers } = useRetailer(); // 🎨 WHITE-LABEL HOOK
+  const { retailer } = useRetailer();
   const { isDarkMode, setIsDarkMode } = useDarkMode();
   const [isEditing, setIsEditing] = useState(false);
-  const [isCardExpanded, setIsCardExpanded] = useState(false);
-  const [isRetailerSwitcherExpanded, setIsRetailerSwitcherExpanded] = useState(false); // 🎨 NEW STATE
   
   // Mock user data
   const [userData, setUserData] = useState({
     name: "Alice Tillett",
     email: "john.doe@example.com",
     phone: "+1 (555) 123-4567",
-    cardNumber: "4242424242424242",
-    points: 7500,
-    level: "Gold",
-    expiryDate: "12/25",
     notifications: {
       emailNotifications: true,
       pushNotifications: true,
@@ -112,15 +100,6 @@ const Profile = () => {
         [key]: !prev.notifications[key],
       },
     }));
-  };
-  
-  // 🎨 Handle retailer switch
-  const handleRetailerSwitch = (newRetailerId: string) => {
-    switchRetailer(newRetailerId as any);
-    toast({
-      title: "Retailer Changed",
-      description: `Switched to ${allRetailers[newRetailerId].name}`,
-    });
   };
   
   // Animation variants
@@ -307,145 +286,6 @@ const Profile = () => {
                 Edit Profile
               </Button>
             </div>
-          </motion.div>
-          
-          {/* 🎨 RETAILER SWITCHER SECTION (NEW!) */}
-          <motion.div
-            className="glass-card rounded-xl overflow-hidden mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.05 }}
-          >
-            <div 
-              className="p-4 flex justify-between items-center cursor-pointer border-b border-border"
-              style={{ backgroundColor: `${retailer.theme.primary}10` }}
-              onClick={() => setIsRetailerSwitcherExpanded(!isRetailerSwitcherExpanded)}
-            >
-              <div className="flex items-center gap-3">
-                <Store 
-                  className="w-5 h-5"
-                  style={{ color: retailer.theme.primary }}
-                />
-                <div>
-                  <h2 className="text-lg font-semibold">Demo: Retailer Branding</h2>
-                  <p className="text-xs text-muted-foreground">
-                    Switch between retailers to see white-label theming
-                  </p>
-                </div>
-              </div>
-              {isRetailerSwitcherExpanded ? (
-                <ChevronUp className="w-5 h-5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
-              )}
-            </div>
-            
-            {isRetailerSwitcherExpanded && (
-              <div className="p-4 space-y-3">
-                {Object.entries(allRetailers).map(([id, config]) => (
-                  <motion.button
-                    key={id}
-                    onClick={() => handleRetailerSwitch(id)}
-                    className="w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md"
-                    style={{
-                      borderColor: retailerId === id ? config.theme.primary : '#e5e7eb',
-                      backgroundColor: retailerId === id ? `${config.theme.primary}10` : 'white',
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-center gap-4">
-                      {id === 'kroger' ? (
-                        <img 
-                          src={krogerLogo} 
-                          alt={`${config.name} Logo`}
-                          className="h-12 w-auto"
-                        />
-                      ) : id === 'heb' ? (
-                        <img 
-                          src={hebLogo} 
-                          alt={`${config.name} Logo`}
-                          className="h-12 w-auto"
-                        />
-                      ) : (
-                        <div 
-                          className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md"
-                          style={{ backgroundColor: config.theme.primary }}
-                        >
-                          {config.shortName.charAt(0)}
-                        </div>
-                      )}
-                      <div className="text-left">
-                        <div className="font-semibold">{config.name}</div>
-                        <div className="text-sm text-muted-foreground">{config.tagline}</div>
-                      </div>
-                    </div>
-                    
-                    {retailerId === id && (
-                      <Check 
-                        className="w-6 h-6" 
-                        style={{ color: config.theme.primary }}
-                      />
-                    )}
-                  </motion.button>
-                ))}
-                
-                {/* Color Preview */}
-                <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-border">
-                  <h4 className="font-semibold mb-3 text-sm">Current Theme Colors:</h4>
-                  <div className="grid grid-cols-4 gap-2">
-                    {Object.entries(retailer.theme).map(([key, color]) => (
-                      <div key={key} className="text-xs">
-                        <div 
-                          className="w-full h-10 rounded border border-border mb-1"
-                          style={{ backgroundColor: color }}
-                        />
-                        <div className="text-muted-foreground capitalize truncate">{key}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Instructions */}
-                <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-lg">
-                  <p>🎨 All colors and branding update automatically</p>
-                  <p>🚀 Deploy separate apps or use subdomains</p>
-                  <p>💡 Perfect for investor demos</p>
-                </div>
-              </div>
-            )}
-          </motion.div>
-          
-          {/* Loyalty Card Section */}
-          <motion.div
-            className="glass-card rounded-xl overflow-hidden mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-          >
-            <div 
-              className="p-6 flex justify-between items-center cursor-pointer border-b border-border"
-              onClick={() => setIsCardExpanded(!isCardExpanded)}
-            >
-              <h2 className="text-lg font-semibold">My Loyalty Card</h2>
-              {isCardExpanded ? (
-                <ChevronUp className="w-5 h-5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
-              )}
-            </div>
-            
-            {isCardExpanded && (
-              <div className="p-6">
-                <LoyaltyCard
-                  name={userData.name}
-                  cardNumber={userData.cardNumber}
-                  points={userData.points}
-                  level={userData.level}
-                  expiryDate={userData.expiryDate}
-                />
-              </div>
-            )}
           </motion.div>
           
           {/* Savings Dashboard */}

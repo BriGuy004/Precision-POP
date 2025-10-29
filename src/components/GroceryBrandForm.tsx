@@ -7,7 +7,7 @@ import { useState } from "react";
 interface GroceryBrandFormProps {
   brand: any;
   onChange: (updates: any) => void;
-  onImageUpload: (file: File, field: 'logo_url' | 'hero_image_url', retailerId: string) => Promise<string | null>;
+  onImageUpload: (file: File, field: 'logo_url', retailerId: string) => Promise<string | null>;
   errors?: Record<string, string>;
   isEdit?: boolean;
 }
@@ -21,7 +21,7 @@ export const GroceryBrandForm = ({
 }: GroceryBrandFormProps) => {
   const [uploading, setUploading] = useState<string | null>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo_url' | 'hero_image_url') => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -30,10 +30,10 @@ export const GroceryBrandForm = ({
       return;
     }
 
-    setUploading(field);
-    const url = await onImageUpload(file, field, brand.retailer_id);
+    setUploading('logo_url');
+    const url = await onImageUpload(file, 'logo_url', brand.retailer_id);
     if (url) {
-      onChange({ [field]: url });
+      onChange({ logo_url: url });
     }
     setUploading(null);
   };
@@ -120,39 +120,6 @@ export const GroceryBrandForm = ({
         {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
       </div>
 
-      {/* Hero Image Upload */}
-      <div>
-        <Label className="text-white">Hero/Background Image *</Label>
-        <p className="text-xs text-gray-400 mb-2">Large background image for the card</p>
-        {brand.hero_image_url ? (
-          <div className="space-y-2">
-            <div className="aspect-video bg-gray-700 rounded overflow-hidden border border-gray-600">
-              <img src={brand.hero_image_url} alt="Hero" className="w-full h-full object-cover" />
-            </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => onChange({ hero_image_url: '' })}
-            >
-              <X className="w-4 h-4 mr-1" />
-              Remove
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileUpload(e, 'hero_image_url')}
-              disabled={uploading === 'hero_image_url'}
-              className="bg-gray-700 text-white border-gray-600"
-            />
-            {uploading === 'hero_image_url' && <span className="text-sm text-gray-400">Uploading...</span>}
-          </div>
-        )}
-        {errors.hero_image_url && <p className="text-red-400 text-sm mt-1">{errors.hero_image_url}</p>}
-      </div>
-
       {/* Logo Upload */}
       <div>
         <Label className="text-white">Logo Image *</Label>
@@ -182,7 +149,7 @@ export const GroceryBrandForm = ({
             <Input
               type="file"
               accept="image/*"
-              onChange={(e) => handleFileUpload(e, 'logo_url')}
+              onChange={handleFileUpload}
               disabled={uploading === 'logo_url'}
               className="bg-gray-700 text-white border-gray-600"
             />
@@ -193,35 +160,19 @@ export const GroceryBrandForm = ({
       </div>
 
       {/* Colors */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label className="text-white">Primary Color</Label>
-          <Input
-            type="color"
-            value={hslToHex(brand.primary_color)}
-            onChange={(e) => onChange({ primary_color: hexToHsl(e.target.value) })}
-            className="bg-gray-700 border-gray-600 h-12 cursor-pointer"
-          />
-          <Input
-            value={hslToHex(brand.primary_color)}
-            readOnly
-            className="bg-gray-700 text-white border-gray-600 mt-2 text-center font-mono"
-          />
-        </div>
-        <div>
-          <Label className="text-white">Accent Color</Label>
-          <Input
-            type="color"
-            value={hslToHex(brand.accent_color)}
-            onChange={(e) => onChange({ accent_color: hexToHsl(e.target.value) })}
-            className="bg-gray-700 border-gray-600 h-12 cursor-pointer"
-          />
-          <Input
-            value={hslToHex(brand.accent_color)}
-            readOnly
-            className="bg-gray-700 text-white border-gray-600 mt-2 text-center font-mono"
-          />
-        </div>
+      <div>
+        <Label className="text-white">Primary Color</Label>
+        <Input
+          type="color"
+          value={hslToHex(brand.primary_color)}
+          onChange={(e) => onChange({ primary_color: hexToHsl(e.target.value) })}
+          className="bg-gray-700 border-gray-600 h-12 cursor-pointer"
+        />
+        <Input
+          value={hslToHex(brand.primary_color)}
+          readOnly
+          className="bg-gray-700 text-white border-gray-600 mt-2 text-center font-mono"
+        />
       </div>
 
       {/* Location */}

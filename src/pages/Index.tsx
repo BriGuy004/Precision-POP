@@ -45,18 +45,8 @@ const Index = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <h1 className="text-4xl font-black text-white mb-4">
-            Welcome Back, {customerName}! 👋
+            Welcome Back, {customerName}!
           </h1>
-          <p className="text-xl text-white/60">
-            You've saved{" "}
-            <span 
-              className="font-bold"
-              style={{ color: retailer.theme.accent }}
-            >
-              ${weekSavings.toFixed(2)}
-            </span>{" "}
-            this week
-          </p>
         </motion.div>
 
         {/* Primary CTA */}
@@ -67,9 +57,9 @@ const Index = () => {
         >
           <Button 
             size="lg" 
-            className="w-full text-lg py-7 rounded-2xl shadow-2xl hover:shadow-xl transition-all group"
+            className="w-full text-lg py-7 rounded-2xl shadow-2xl hover:shadow-xl transition-all group text-white"
             style={{
-              background: `linear-gradient(135deg, ${retailer.theme.primary}, ${retailer.theme.secondary})`
+              backgroundColor: retailer.theme.primary
             }}
             onClick={() => navigate("/coupons")}
           >

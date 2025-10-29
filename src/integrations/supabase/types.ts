@@ -16,10 +16,8 @@ export type Database = {
     Tables: {
       retailers: {
         Row: {
-          accent_color: string | null
           city: string | null
           created_at: string | null
-          hero_image_url: string | null
           id: string
           is_active: boolean | null
           logo_url: string
@@ -32,10 +30,8 @@ export type Database = {
           website: string | null
         }
         Insert: {
-          accent_color?: string | null
           city?: string | null
           created_at?: string | null
-          hero_image_url?: string | null
           id?: string
           is_active?: boolean | null
           logo_url: string
@@ -48,10 +44,8 @@ export type Database = {
           website?: string | null
         }
         Update: {
-          accent_color?: string | null
           city?: string | null
           created_at?: string | null
-          hero_image_url?: string | null
           id?: string
           is_active?: boolean | null
           logo_url?: string
