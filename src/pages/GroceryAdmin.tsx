@@ -155,13 +155,16 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Wait for refresh to complete FIRST
+      // Wait for refresh to complete
       await refreshBrands();
+      
+      // Small delay to ensure React state propagates
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Show success
       toast.success("Grocery brand added successfully!");
       
-      // THEN close form and reset state
+      // Close form and reset state
       setIsAddingBrand(false);
       setNewBrand({
         retailer_id: "",
@@ -219,13 +222,16 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Wait for refresh to complete FIRST
+      // Wait for refresh to complete
       await refreshBrands();
+      
+      // Small delay to ensure React state propagates
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Show success
       toast.success("Grocery brand updated successfully!");
       
-      // THEN close dialog and clear state
+      // Close dialog
       setEditingBrandId(null);
       setEditedBrand(null);
       
@@ -251,13 +257,16 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Wait for refresh to complete FIRST
+      // Wait for refresh to complete
       await refreshBrands();
+      
+      // Small delay to ensure React state propagates
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Show success
       toast.success("Grocery brand deleted successfully!");
       
-      // THEN close dialog
+      // Close dialog
       setDeleteConfirm(null);
     } catch (err: any) {
       console.error('Delete error:', err);
