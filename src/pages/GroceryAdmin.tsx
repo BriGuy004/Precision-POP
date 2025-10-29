@@ -151,10 +151,17 @@ const GroceryAdmin = () => {
         } else {
           toast.error(`Database error: ${error.message}`);
         }
+        setIsSaving(false);
         return;
       }
 
+      // Wait for refresh to complete FIRST
+      await refreshBrands();
+      
+      // Show success
       toast.success("Grocery brand added successfully!");
+      
+      // THEN close form and reset state
       setIsAddingBrand(false);
       setNewBrand({
         retailer_id: "",
@@ -166,8 +173,6 @@ const GroceryAdmin = () => {
         website: "",
         tagline: ""
       });
-      
-      await refreshBrands();
     } catch (err: any) {
       console.error('Add brand error:', err);
       toast.error(`Unexpected error: ${err.message}`);
@@ -242,13 +247,18 @@ const GroceryAdmin = () => {
 
       if (error) {
         toast.error(`Delete failed: ${error.message}`);
+        setIsDeleting(false);
         return;
       }
 
-      toast.success("Grocery brand deleted successfully!");
-      setDeleteConfirm(null);
-      
+      // Wait for refresh to complete FIRST
       await refreshBrands();
+      
+      // Show success
+      toast.success("Grocery brand deleted successfully!");
+      
+      // THEN close dialog
+      setDeleteConfirm(null);
     } catch (err: any) {
       console.error('Delete error:', err);
       toast.error(`Unexpected error: ${err.message}`);
