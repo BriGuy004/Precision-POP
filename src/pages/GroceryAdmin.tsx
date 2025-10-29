@@ -340,51 +340,48 @@ const GroceryAdmin = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBrands.map((brand) => (
-            <Card key={brand.id} className={`bg-gray-800 ${brand.is_active ? "border-green-500" : "border-gray-700"}`}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="flex items-center gap-2 text-white">
-                      {brand.name}
-                      {brand.is_active && (
-                        <Badge className="ml-2 bg-green-600">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          Active
-                        </Badge>
-                      )}
-                    </CardTitle>
-                    <CardDescription className="mt-2 text-gray-400">
-                      ID: {brand.retailer_id}
-                    </CardDescription>
+            <Card key={brand.id} className={`bg-gray-800 border-2 ${brand.is_active ? "border-green-500" : "border-gray-700"}`}>
+              <CardContent className="p-0">
+                {/* Large Logo Display */}
+                <div className="relative h-48 bg-gray-900 rounded-t-lg overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={brand.logo_url} 
+                    alt={`${brand.name} logo`}
+                    className="max-h-32 max-w-[80%] object-contain"
+                  />
+                  {brand.is_active && (
+                    <Badge className="absolute top-3 right-3 bg-green-600">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Active
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Brand Info & Actions */}
+                <div className="p-4 space-y-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{brand.name}</h3>
+                    <p className="text-xs text-gray-400">ID: {brand.retailer_id}</p>
                     {brand.city && brand.state && (
-                      <CardDescription className="text-gray-400">
-                        {brand.city}, {brand.state}
-                      </CardDescription>
+                      <p className="text-xs text-gray-400">{brand.city}, {brand.state}</p>
                     )}
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Primary Color Background with Logo */}
-                  <div 
-                    className="flex items-center justify-center p-8 rounded-lg border-2 border-gray-600"
-                    style={{ backgroundColor: `hsl(${brand.primary_color})` }}
-                  >
-                    <div className="bg-white p-3 rounded-lg shadow-lg">
-                      <img 
-                        src={brand.logo_url} 
-                        alt={`${brand.name} logo`}
-                        className="h-16 object-contain"
-                      />
-                    </div>
+
+                  {/* Primary Color Bar */}
+                  <div>
+                    <p className="text-xs text-gray-400 mb-2">Primary Color</p>
+                    <div 
+                      className="w-full h-12 rounded-lg border border-gray-600"
+                      style={{ backgroundColor: `hsl(${brand.primary_color})` }}
+                    />
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-2">
                     <Button 
                       onClick={() => handleEditBrand(brand)} 
                       variant="outline" 
-                      className="flex-1"
+                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
                     >
                       Edit
                     </Button>
@@ -392,7 +389,7 @@ const GroceryAdmin = () => {
                       <Button
                         onClick={() => handleBrandSwitch(brand.retailer_id)}
                         disabled={isSwitchingBrand}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
                       >
                         {isSwitchingBrand ? (
                           <>
@@ -408,6 +405,7 @@ const GroceryAdmin = () => {
                       variant="destructive" 
                       size="icon"
                       onClick={() => setDeleteConfirm(brand.id || null)}
+                      className="bg-red-500 hover:bg-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
