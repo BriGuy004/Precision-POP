@@ -206,24 +206,42 @@ const GroceryAdmin = () => {
     setIsSaving(true);
     
     try {
-      const { error } = await supabase
+      const updateData = {
+        name: editedBrand.name,
+        logo_url: editedBrand.logo_url,
+        primary_color: editedBrand.primary_color,
+        city: editedBrand.city || '',
+        state: editedBrand.state || '',
+        website: editedBrand.website || '',
+        tagline: editedBrand.tagline || ''
+      };
+      
+      console.log('📝 Updating brand with ID:', editedBrand.id);
+      console.log('📝 Update data:', updateData);
+      
+      const { data, error } = await supabase
         .from('retailers')
-        .update({
-          name: editedBrand.name,
-          logo_url: editedBrand.logo_url,
-          primary_color: editedBrand.primary_color,
-          city: editedBrand.city || '',
-          state: editedBrand.state || '',
-          website: editedBrand.website || '',
-          tagline: editedBrand.tagline || ''
-        })
-        .eq('id', editedBrand.id);
+        .update(updateData)
+        .eq('id', editedBrand.id)
+        .select();
+
+      console.log('📝 Update response:', { data, error });
 
       if (error) {
+        console.error('❌ Update error:', error);
         toast.error(`Database error: ${error.message}`);
         setIsSaving(false);
         return;
       }
+      
+      if (!data || data.length === 0) {
+        console.error('❌ Update returned no data - ID might not exist');
+        toast.error('Failed to update: Brand not found');
+        setIsSaving(false);
+        return;
+      }
+      
+      console.log('✅ Update successful, returned data:', data);
 
       // Wait for refresh to complete
       console.log('🔧 About to call refreshBrands()');
