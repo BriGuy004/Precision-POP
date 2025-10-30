@@ -1,1 +1,4 @@
 project_id = "dfaqhnxvpgxursareakm"
+
+[functions.fetch-spoonacular-recipe]
+verify_jwt = false
