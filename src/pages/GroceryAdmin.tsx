@@ -190,6 +190,9 @@ const GroceryAdmin = () => {
   };
 
   const handleSaveEdit = async () => {
+    console.log('🔧 handleSaveEdit CALLED');
+    console.log('🔧 editedBrand:', editedBrand);
+    
     if (!editedBrand) return;
 
     const errors = validateBrand(editedBrand);
@@ -223,7 +226,9 @@ const GroceryAdmin = () => {
       }
 
       // Wait for refresh to complete
+      console.log('🔧 About to call refreshBrands()');
       await refreshBrands();
+      console.log('🔧 refreshBrands() COMPLETED');
       
       // Small delay to ensure React state propagates
       await new Promise(resolve => setTimeout(resolve, 200));
