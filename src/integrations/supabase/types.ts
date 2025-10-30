@@ -54,11 +54,13 @@ export type Database = {
       }
       recipes: {
         Row: {
+          cook_time: number | null
           created_at: string
+          description: string | null
           id: string
-          image: string | null
+          image_url: string | null
           instructions: string | null
-          ready_in_minutes: number | null
+          prep_time: number | null
           servings: number | null
           source_url: string | null
           title: string
@@ -66,11 +68,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cook_time?: number | null
           created_at?: string
+          description?: string | null
           id?: string
-          image?: string | null
+          image_url?: string | null
           instructions?: string | null
-          ready_in_minutes?: number | null
+          prep_time?: number | null
           servings?: number | null
           source_url?: string | null
           title: string
@@ -78,11 +82,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cook_time?: number | null
           created_at?: string
+          description?: string | null
           id?: string
-          image?: string | null
+          image_url?: string | null
           instructions?: string | null
-          ready_in_minutes?: number | null
+          prep_time?: number | null
           servings?: number | null
           source_url?: string | null
           title?: string
