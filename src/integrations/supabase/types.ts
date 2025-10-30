@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      recipe_ingredients: {
+        Row: {
+          amount: number | null
+          id: string
+          name: string
+          original_string: string | null
+          recipe_id: string
+          sort_order: number | null
+          unit: string | null
+        }
+        Insert: {
+          amount?: number | null
+          id?: string
+          name: string
+          original_string?: string | null
+          recipe_id: string
+          sort_order?: number | null
+          unit?: string | null
+        }
+        Update: {
+          amount?: number | null
+          id?: string
+          name?: string
+          original_string?: string | null
+          recipe_id?: string
+          sort_order?: number | null
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          created_at: string
+          id: string
+          image: string | null
+          instructions: string | null
+          ready_in_minutes: number | null
+          servings: number | null
+          source_url: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          instructions?: string | null
+          ready_in_minutes?: number | null
+          servings?: number | null
+          source_url?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          instructions?: string | null
+          ready_in_minutes?: number | null
+          servings?: number | null
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       retailers: {
         Row: {
           city: string | null

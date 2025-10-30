@@ -54,6 +54,7 @@ const Index = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
+          className="space-y-4"
         >
           <Button 
             size="lg" 
@@ -64,6 +65,16 @@ const Index = () => {
             onClick={() => navigate("/coupons")}
           >
             Start Shopping
+            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="w-full text-lg py-7 rounded-2xl shadow-xl hover:shadow-2xl transition-all group"
+            onClick={() => navigate("/recipes/import")}
+          >
+            Import Recipe
             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </motion.div>

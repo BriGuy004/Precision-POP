@@ -17,6 +17,8 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Coupons = lazy(() => import("./pages/WhiteLabelCoupons"));
 const Shop = lazy(() => import("./pages/Shop"));
 const ShoppingList = lazy(() => import("./pages/ShoppingList"));
+const RecipeImport = lazy(() => import("./pages/RecipeImport"));
+const Recipes = lazy(() => import("./pages/Recipes"));
 const GroceryAdmin = lazy(() => import("./pages/GroceryAdmin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -38,6 +40,8 @@ const App = () => (
                 <Route path="/coupons" element={<Coupons />} />
                 <Route path="/shop" element={<Shop />} />
                 <Route path="/shopping-list" element={<ShoppingList />} />
+                <Route path="/recipes/import" element={<RecipeImport />} />
+                <Route path="/recipes" element={<Recipes />} />
                 <Route path="/admin/grocery" element={<GroceryAdmin />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
