@@ -75,14 +75,18 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   });
 
   const fetchBrands = async () => {
+    console.log('🔄 fetchBrands STARTED');
     try {
       // Small delay to ensure Postgres consistency
       await new Promise(resolve => setTimeout(resolve, 100));
       
+      console.log('📡 About to query Supabase...');
       const { data, error } = await supabase
         .from('retailers')
         .select('*')
         .order('name');
+
+      console.log('📦 Supabase returned:', { data, error });
 
       if (error) throw error;
 
@@ -100,8 +104,10 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }));
 
       console.log('✅ Fetched brands:', brands);
+      console.log('🔢 Total brands:', brands.length);
 
       setAllBrands(brands);
+      console.log('💾 State updated with brands');
 
       const activeBrand = brands.find(b => b.is_active) || brands[0];
       if (activeBrand) {
@@ -109,11 +115,12 @@ export const BrandProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         applyBrandStyles(activeBrand);
       }
     } catch (error: any) {
-      console.error('Error fetching brands:', error);
+      console.error('❌ Error fetching brands:', error);
       toast.error('Failed to load grocery brands');
     } finally {
       setIsLoading(false);
     }
+    console.log('✅ fetchBrands COMPLETED');
   };
 
   const applyBrandStyles = (brand: Brand) => {
