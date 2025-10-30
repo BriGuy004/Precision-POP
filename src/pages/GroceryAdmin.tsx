@@ -43,7 +43,7 @@ const GroceryAdmin = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [newBrand, setNewBrand] = useState<Omit<Retailer, 'id'>>({
+  const [newBrand, setNewBrand] = useState<Omit<Retailer, "id">>({
     retailer_id: "",
     name: "",
     logo_url: "",
@@ -51,40 +51,41 @@ const GroceryAdmin = () => {
     city: "",
     state: "",
     website: "",
-    tagline: ""
+    tagline: "",
   });
 
   const filteredBrands = useMemo(() => {
     return allBrands
-      .filter(brand =>
-        searchTerm === "" ||
-        brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        brand.retailer_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        brand.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        brand.state?.toLowerCase().includes(searchTerm.toLowerCase())
+      .filter(
+        (brand) =>
+          searchTerm === "" ||
+          brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          brand.retailer_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          brand.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          brand.state?.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [allBrands, searchTerm]);
 
   const validateBrand = (brand: Partial<Retailer>): Record<string, string> => {
     const errors: Record<string, string> = {};
-    
+
     if (!brand.retailer_id) {
       errors.retailer_id = "Retailer ID is required";
     } else if (!/^[a-z0-9-]+$/.test(brand.retailer_id)) {
       errors.retailer_id = "Must be lowercase alphanumeric with hyphens";
     }
-    
+
     if (!brand.name || brand.name.length < 2) {
       errors.name = "Name must be at least 2 characters";
     }
-    
-    if (brand.website && !brand.website.startsWith('http')) {
+
+    if (brand.website && !brand.website.startsWith("http")) {
       errors.website = "Must start with http:// or https://";
     }
-    
+
     if (!brand.logo_url) errors.logo_url = "Logo is required";
-    
+
     return errors;
   };
 
@@ -92,38 +93,32 @@ const GroceryAdmin = () => {
     await setActiveBrand(retailerId);
   };
 
-  const handleImageUpload = async (
-    file: File, 
-    field: 'logo_url',
-    retailerId: string
-  ): Promise<string | null> => {
+  const handleImageUpload = async (file: File, field: "logo_url", retailerId: string): Promise<string | null> => {
     try {
       if (!retailerId) {
         toast.error("Please enter a Retailer ID first");
         return null;
       }
 
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${retailerId}-${field}-${Date.now()}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('brand-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      const { error: uploadError } = await supabase.storage.from("brand-images").upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('brand-images')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("brand-images").getPublicUrl(filePath);
 
-      toast.success(`${field.replace('_', ' ')} uploaded successfully!`);
+      toast.success(`${field.replace("_", " ")} uploaded successfully!`);
       return publicUrl;
     } catch (error: any) {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
       toast.error(`Upload failed: ${error.message}`);
       return null;
     }
@@ -131,22 +126,20 @@ const GroceryAdmin = () => {
 
   const handleAddBrand = async () => {
     const errors = validateBrand(newBrand);
-    
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       toast.error("Please fix the errors before saving");
       return;
     }
-    
+
     setFormErrors({});
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('retailers')
-        .insert([newBrand]);
+      const { error } = await supabase.from("retailers").insert([newBrand]);
 
       if (error) {
-        if (error.code === '23505') {
+        if (error.code === "23505") {
           toast.error("A retailer with this ID already exists");
         } else {
           toast.error(`Database error: ${error.message}`);
@@ -155,16 +148,11 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Wait for refresh to complete
       await refreshBrands();
-      
-      // Small delay to ensure React state propagates
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Show success
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       toast.success("Grocery brand added successfully!");
-      
-      // Close form and reset state
+
       setIsAddingBrand(false);
       setNewBrand({
         retailer_id: "",
@@ -174,10 +162,10 @@ const GroceryAdmin = () => {
         city: "",
         state: "",
         website: "",
-        tagline: ""
+        tagline: "",
       });
     } catch (err: any) {
-      console.error('Add brand error:', err);
+      console.error("Add brand error:", err);
       toast.error(`Unexpected error: ${err.message}`);
     } finally {
       setIsSaving(false);
@@ -185,15 +173,36 @@ const GroceryAdmin = () => {
   };
 
   const handleEditBrand = (brand: any) => {
-    setEditingBrandId(brand.id || null);
+    console.log("🎬 handleEditBrand called with brand:", brand);
+    console.log("🎬 brand.id:", brand.id);
+    console.log("🎬 typeof brand.id:", typeof brand.id);
+
+    if (!brand.id) {
+      console.error("❌ Brand has no ID!");
+      toast.error("Error: Brand ID is missing");
+      return;
+    }
+
+    setEditingBrandId(brand.id);
     setEditedBrand({ ...brand });
   };
 
   const handleSaveEdit = async () => {
-    console.log('🔧 handleSaveEdit CALLED');
-    console.log('🔧 editedBrand:', editedBrand);
-    
-    if (!editedBrand) return;
+    console.log("🔧 handleSaveEdit CALLED");
+    console.log("🔧 editedBrand:", editedBrand);
+    console.log("🔧 editedBrand?.id:", editedBrand?.id);
+    console.log("🔧 typeof editedBrand?.id:", typeof editedBrand?.id);
+
+    if (!editedBrand) {
+      console.error("❌ No editedBrand");
+      return;
+    }
+
+    if (!editedBrand.id) {
+      console.error("❌ editedBrand has no ID!");
+      toast.error("Error: Cannot update - brand ID is missing");
+      return;
+    }
 
     const errors = validateBrand(editedBrand);
     if (Object.keys(errors).length > 0) {
@@ -201,65 +210,57 @@ const GroceryAdmin = () => {
       toast.error("Please fix the errors before saving");
       return;
     }
-    
+
     setFormErrors({});
     setIsSaving(true);
-    
+
     try {
       const updateData = {
         name: editedBrand.name,
         logo_url: editedBrand.logo_url,
         primary_color: editedBrand.primary_color,
-        city: editedBrand.city || '',
-        state: editedBrand.state || '',
-        website: editedBrand.website || '',
-        tagline: editedBrand.tagline || ''
+        city: editedBrand.city || "",
+        state: editedBrand.state || "",
+        website: editedBrand.website || "",
+        tagline: editedBrand.tagline || "",
       };
-      
-      console.log('📝 Updating brand with ID:', editedBrand.id);
-      console.log('📝 Update data:', updateData);
-      
-      const { data, error } = await supabase
-        .from('retailers')
-        .update(updateData)
-        .eq('id', editedBrand.id)
-        .select();
 
-      console.log('📝 Update response:', { data, error });
+      console.log("📝 Updating brand with ID:", editedBrand.id);
+      console.log("📝 Update data:", updateData);
+
+      const { data, error } = await supabase.from("retailers").update(updateData).eq("id", editedBrand.id).select();
+
+      console.log("📝 Update response data:", data);
+      console.log("📝 Update response error:", error);
 
       if (error) {
-        console.error('❌ Update error:', error);
+        console.error("❌ Update error:", error);
         toast.error(`Database error: ${error.message}`);
         setIsSaving(false);
         return;
       }
-      
+
       if (!data || data.length === 0) {
-        console.error('❌ Update returned no data - ID might not exist');
-        toast.error('Failed to update: Brand not found');
+        console.error("❌ Update returned no data - ID might not exist in database");
+        toast.error("Failed to update: Brand not found in database");
         setIsSaving(false);
         return;
       }
-      
-      console.log('✅ Update successful, returned data:', data);
 
-      // Wait for refresh to complete
-      console.log('🔧 About to call refreshBrands()');
+      console.log("✅ Update successful, returned data:", data);
+      console.log("🔧 About to call refreshBrands()");
+
       await refreshBrands();
-      console.log('🔧 refreshBrands() COMPLETED');
-      
-      // Small delay to ensure React state propagates
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Show success
+
+      console.log("🔧 refreshBrands() COMPLETED");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       toast.success("Grocery brand updated successfully!");
-      
-      // Close dialog
+
       setEditingBrandId(null);
       setEditedBrand(null);
-      
     } catch (err: any) {
-      console.error('Update error:', err);
+      console.error("❌ Unexpected error in handleSaveEdit:", err);
       toast.error(`Unexpected error: ${err.message}`);
     } finally {
       setIsSaving(false);
@@ -269,10 +270,7 @@ const GroceryAdmin = () => {
   const handleDeleteBrand = async (brandId: string) => {
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from('retailers')
-        .delete()
-        .eq('id', brandId);
+      const { error } = await supabase.from("retailers").delete().eq("id", brandId);
 
       if (error) {
         toast.error(`Delete failed: ${error.message}`);
@@ -280,19 +278,13 @@ const GroceryAdmin = () => {
         return;
       }
 
-      // Wait for refresh to complete
       await refreshBrands();
-      
-      // Small delay to ensure React state propagates
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Show success
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       toast.success("Grocery brand deleted successfully!");
-      
-      // Close dialog
       setDeleteConfirm(null);
     } catch (err: any) {
-      console.error('Delete error:', err);
+      console.error("Delete error:", err);
       toast.error(`Unexpected error: ${err.message}`);
     } finally {
       setIsDeleting(false);
@@ -334,7 +326,7 @@ const GroceryAdmin = () => {
             />
             {searchTerm && (
               <p className="text-sm text-gray-400 mt-2">
-                Found {filteredBrands.length} {filteredBrands.length === 1 ? 'brand' : 'brands'}
+                Found {filteredBrands.length} {filteredBrands.length === 1 ? "brand" : "brands"}
               </p>
             )}
           </div>
@@ -352,10 +344,10 @@ const GroceryAdmin = () => {
               <GroceryBrandForm
                 brand={newBrand}
                 onChange={(updates) => {
-                  setNewBrand(prev => ({ ...prev, ...updates }));
+                  setNewBrand((prev) => ({ ...prev, ...updates }));
                   const fieldKey = Object.keys(updates)[0];
                   if (fieldKey) {
-                    setFormErrors(prev => {
+                    setFormErrors((prev) => {
                       const next = { ...prev };
                       delete next[fieldKey];
                       return next;
@@ -388,84 +380,94 @@ const GroceryAdmin = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBrands.map((brand) => (
-            <Card key={brand.id} className={`bg-gray-800 border-2 ${brand.is_active ? "border-green-500" : "border-gray-700"}`}>
-              <CardContent className="p-0">
-                {/* Large Logo Display */}
-                <div className="relative h-48 bg-gray-900 rounded-t-lg overflow-hidden flex items-center justify-center">
-                  <img 
-                    src={brand.logo_url} 
-                    alt={`${brand.name} logo`}
-                    className="max-h-32 max-w-[80%] object-contain"
-                  />
-                  {brand.is_active && (
-                    <Badge className="absolute top-3 right-3 bg-green-600">
-                      <CheckCircle2 className="w-3 h-3 mr-1" />
-                      Active
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Brand Info & Actions */}
-                <div className="p-4 space-y-3">
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{brand.name}</h3>
-                    <p className="text-xs text-gray-400">ID: {brand.retailer_id}</p>
-                    {brand.city && brand.state && (
-                      <p className="text-xs text-gray-400">{brand.city}, {brand.state}</p>
-                    )}
-                  </div>
-
-                  {/* Primary Color Bar */}
-                  <div>
-                    <p className="text-xs text-gray-400 mb-2">Primary Color</p>
-                    <div 
-                      className="w-full h-12 rounded-lg border border-gray-600"
-                      style={{ backgroundColor: `hsl(${brand.primary_color})` }}
+          {filteredBrands.map((brand) => {
+            console.log("🎨 Rendering brand card:", { id: brand.id, name: brand.name });
+            return (
+              <Card
+                key={brand.id}
+                className={`bg-gray-800 border-2 ${brand.is_active ? "border-green-500" : "border-gray-700"}`}
+              >
+                <CardContent className="p-0">
+                  <div className="relative h-48 bg-gray-900 rounded-t-lg overflow-hidden flex items-center justify-center">
+                    <img
+                      src={brand.logo_url}
+                      alt={`${brand.name} logo`}
+                      className="max-h-32 max-w-[80%] object-contain"
                     />
+                    {brand.is_active && (
+                      <Badge className="absolute top-3 right-3 bg-green-600">
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
+                    )}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
-                    <Button 
-                      onClick={() => handleEditBrand(brand)} 
-                      variant="outline" 
-                      className="flex-1 bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
-                    >
-                      Edit
-                    </Button>
-                    {!brand.is_active && (
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <h3 className="text-lg font-bold text-white">{brand.name}</h3>
+                      <p className="text-xs text-gray-400">ID: {brand.retailer_id}</p>
+                      {brand.city && brand.state && (
+                        <p className="text-xs text-gray-400">
+                          {brand.city}, {brand.state}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <p className="text-xs text-gray-400 mb-2">Primary Color</p>
+                      <div
+                        className="w-full h-12 rounded-lg border border-gray-600"
+                        style={{ backgroundColor: `hsl(${brand.primary_color})` }}
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
                       <Button
-                        onClick={() => handleBrandSwitch(brand.retailer_id)}
-                        disabled={isSwitchingBrand}
-                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                        onClick={() => handleEditBrand(brand)}
+                        variant="outline"
+                        className="flex-1 bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
                       >
-                        {isSwitchingBrand ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Switching...
-                          </>
-                        ) : (
-                          "Switch"
-                        )}
+                        Edit
                       </Button>
-                    )}
-                    <Button 
-                      variant="destructive" 
-                      size="icon"
-                      onClick={() => setDeleteConfirm(brand.id || null)}
-                      className="bg-red-500 hover:bg-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      {!brand.is_active && (
+                        <Button
+                          onClick={() => handleBrandSwitch(brand.retailer_id)}
+                          disabled={isSwitchingBrand}
+                          className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                        >
+                          {isSwitchingBrand ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Switching...
+                            </>
+                          ) : (
+                            "Switch"
+                          )}
+                        </Button>
+                      )}
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => setDeleteConfirm(brand.id || null)}
+                        className="bg-red-500 hover:bg-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        <Sheet open={!!editingBrandId} onOpenChange={() => setEditingBrandId(null)}>
+        <Sheet
+          open={!!editingBrandId}
+          onOpenChange={() => {
+            setEditingBrandId(null);
+            setEditedBrand(null);
+          }}
+        >
           <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gray-800">
             <SheetHeader>
               <SheetTitle className="text-white">Edit Grocery Brand</SheetTitle>
@@ -477,8 +479,8 @@ const GroceryAdmin = () => {
                     <div className="mb-4">
                       <p className="text-sm text-gray-400 mb-2">Current Logo Preview:</p>
                       <div className="flex items-center justify-center p-6 bg-gray-700 rounded-lg border border-gray-600">
-                        <img 
-                          src={editedBrand.logo_url} 
+                        <img
+                          src={editedBrand.logo_url}
                           alt={`${editedBrand.name} logo`}
                           className="h-20 object-contain"
                         />
@@ -488,13 +490,13 @@ const GroceryAdmin = () => {
                   <GroceryBrandForm
                     brand={editedBrand}
                     onChange={(updates) => {
-                      setEditedBrand(prev => {
+                      setEditedBrand((prev) => {
                         if (!prev) return prev;
                         return { ...prev, ...updates };
                       });
                       const fieldKey = Object.keys(updates)[0];
                       if (fieldKey) {
-                        setFormErrors(prev => {
+                        setFormErrors((prev) => {
                           const next = { ...prev };
                           delete next[fieldKey];
                           return next;
@@ -521,7 +523,14 @@ const GroceryAdmin = () => {
                     </>
                   )}
                 </Button>
-                <Button variant="outline" onClick={() => setEditingBrandId(null)} disabled={isSaving}>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingBrandId(null);
+                    setEditedBrand(null);
+                  }}
+                  disabled={isSaving}
+                >
                   Cancel
                 </Button>
               </div>
@@ -539,7 +548,7 @@ const GroceryAdmin = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 onClick={() => deleteConfirm && handleDeleteBrand(deleteConfirm)}
                 className="bg-red-600 hover:bg-red-700"
                 disabled={isDeleting}
