@@ -67,7 +67,7 @@ const Layout = ({ children }: LayoutProps) => {
                   to={item.path}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
                   style={{
-                    color: isActive(item.path) ? retailer.theme.primary : retailer.theme.text,
+                    color: isActive(item.path) ? retailer.theme.primary : '#ffffff',
                     backgroundColor: isActive(item.path) ? `${retailer.theme.primary}15` : 'transparent',
                   }}
                 >
