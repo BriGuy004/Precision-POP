@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, animate } from "framer-motion";
 import { ShoppingCart, Undo2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRetailer } from "@/contexts/BrandContext";
@@ -21,6 +21,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
   const [savedCoupons, setSavedCoupons] = useState<Coupon[]>([]);
   const [discardedCoupons, setDiscardedCoupons] = useState<Coupon[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSwiping, setIsSwiping] = useState(false);
 
   const currentCoupon = coupons[currentIndex];
 
@@ -71,17 +72,22 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
   };
 
   const handleSwipe = async (swipeDirection: string, method: 'gesture' | 'button' = 'gesture') => {
-    if (!currentCoupon) return;
+    if (!currentCoupon || isSwiping) return;
     
+    setIsSwiping(true);
     triggerHaptic('medium');
     setDirection(swipeDirection);
+    
+    // Animate card off screen
+    const exitX = swipeDirection === 'right' ? 500 : -500;
+    await animate(x, exitX, { type: "spring", stiffness: 300, damping: 30 });
     
     const dragInfo = {
       distance: Math.abs(x.get()),
       velocity: Math.abs(x.getVelocity()),
     };
 
-    await analyticsService.trackSwipe(
+    analyticsService.trackSwipe(
       currentCoupon, 
       swipeDirection as 'left' | 'right', 
       method,
@@ -104,26 +110,30 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
       }
     }
     
-    setTimeout(() => {
-      setCoupons(prev => prev.filter((_, i) => i !== currentIndex));
-      setDirection(null);
-      x.set(0);
-    }, 350);
+    // Remove card and reset for next
+    setCoupons(prev => prev.filter((_, i) => i !== currentIndex));
+    setDirection(null);
+    x.set(0);
+    setIsSwiping(false);
   };
 
   const handleDragEnd = async (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (isSwiping) return;
+    
     const SWIPE_THRESHOLD = 100;
-    const VELOCITY_THRESHOLD = 0.5;
+    const VELOCITY_THRESHOLD = 500;
     
     const velocity = Math.abs(info.velocity.x);
     const offset = info.offset.x;
     
-    if (offset > SWIPE_THRESHOLD || (offset > 50 && velocity > VELOCITY_THRESHOLD * 1000)) {
+    if (offset > SWIPE_THRESHOLD || (offset > 50 && velocity > VELOCITY_THRESHOLD)) {
       await handleSwipe("right", "gesture");
-    } else if (offset < -SWIPE_THRESHOLD || (offset < -50 && velocity > VELOCITY_THRESHOLD * 1000)) {
+    } else if (offset < -SWIPE_THRESHOLD || (offset < -50 && velocity > VELOCITY_THRESHOLD)) {
       await handleSwipe("left", "gesture");
     } else {
+      // Spring back to center with smooth animation
       triggerHaptic('light');
+      animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
     }
   };
 
@@ -205,35 +215,32 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         {isLoading || coupons.length === 0 ? (
           <EmptyState isLoading={isLoading} />
         ) : (
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence mode="popLayout" initial={false}>
             {currentCoupon && (
               <motion.div
                 key={currentCoupon.id}
                 className="absolute inset-0 rounded-2xl overflow-hidden"
                 style={{ x, rotate }}
-                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                initial={{ scale: 0.9, opacity: 0, y: 30 }}
                 animate={{ 
                   scale: 1, 
                   opacity: 1,
                   y: 0,
                 }}
                 exit={{ 
-                  scale: 0.8, 
                   opacity: 0,
-                  x: direction === "left" ? -400 : direction === "right" ? 400 : 0,
-                  rotate: direction === "left" ? -45 : direction === "right" ? 45 : 0,
-                  transition: { duration: 0.3 }
+                  transition: { duration: 0.1 }
                 }}
                 transition={{ 
                   type: "spring", 
                   stiffness: 400, 
-                  damping: 30
+                  damping: 35
                 }}
                 drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
+                dragConstraints={{ left: -300, right: 300 }}
                 onDragEnd={handleDragEnd}
-                whileDrag={{ scale: 1.03, cursor: 'grabbing' }}
-                dragElastic={0.2}
+                whileDrag={{ scale: 1.02, cursor: 'grabbing' }}
+                dragElastic={0.9}
               >
                 <SwipeDirectionOverlay 
                   bgOpacityLeft={bgOpacityLeft}
