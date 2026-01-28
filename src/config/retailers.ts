@@ -146,8 +146,8 @@ export const getCurrentRetailerId = (): RetailerId => {
     }
   }
 
-  // Default to demo
-  return 'demo';
+  // Default to H-E-B for demo
+  return 'heb';
 };
 
 export const getCurrentRetailer = (): RetailerConfig => {

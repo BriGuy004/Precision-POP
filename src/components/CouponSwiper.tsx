@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, animate } from "framer-motion";
-import { ShoppingCart, Undo2 } from "lucide-react";
+import { ShoppingCart, Undo2, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRetailer } from "@/contexts/BrandContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,12 @@ import CouponCard from "./coupon/WhiteLabelCouponCard";
 import SwipeDirectionOverlay from "./coupon/SwipeDirectionOverlay";
 import EmptyState from "./coupon/EmptyState";
 import hebCoupons from "@/data/hebCoupons";
+
+// Demo store location - can be customized
+const DEMO_STORE = {
+  name: "H-E-B Mueller",
+  address: "1801 E 51st St, Austin",
+};
 
 const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps) => {
   const { toast } = useToast();
@@ -26,10 +32,15 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
 
   const currentCoupon = coupons[currentIndex];
   
-  // Fetch coupons from Supabase
+  // Fetch coupons from Supabase with guaranteed fallback
   useEffect(() => {
     const fetchCoupons = async () => {
       setIsLoading(true);
+      
+      // ALWAYS start with cached fallback for instant display
+      // This ensures demo NEVER shows empty state
+      setCoupons(hebCoupons);
+      
       try {
         const { data, error } = await supabase
           .from('coupons')
@@ -37,7 +48,11 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+          console.warn('Supabase error, using cached coupons:', error.message);
+          // Already have hebCoupons loaded, no action needed
+          return;
+        }
         
         if (data && data.length > 0) {
           // Transform Supabase data to match Coupon type
@@ -52,14 +67,11 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
             brand: c.brand,
           }));
           setCoupons(transformedCoupons);
-        } else {
-          // Fallback to hardcoded coupons if no data in Supabase
-          setCoupons(hebCoupons);
         }
+        // If no Supabase data, hebCoupons are already loaded
       } catch (error) {
-        console.error('Error fetching coupons:', error);
-        // Fallback to hardcoded coupons on error
-        setCoupons(hebCoupons);
+        console.error('Error fetching coupons, using cached:', error);
+        // hebCoupons already loaded, demo will work fine
       } finally {
         setIsLoading(false);
       }
@@ -146,9 +158,9 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         setSavedCoupons(prev => [...prev, currentCoupon]);
         
         toast({
-          title: "Saved!",
-          description: `${currentCoupon.title} added to your wallet.`,
-          duration: 2000,
+          title: "✓ SAVED!",
+          description: `${currentCoupon.title} - ${currentCoupon.description?.slice(0, 40)}...`,
+          duration: 2500,
         });
       }
     }
@@ -201,18 +213,32 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
       <div className="absolute top-0 left-0 right-0 z-50 
                       bg-gradient-to-b from-black/90 via-black/70 to-transparent 
                       pt-[env(safe-area-inset-top,1rem)]">
+        {/* CHECK-IN BANNER - TV Readable */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-center gap-2 py-2 px-4 
+                     bg-gradient-to-r from-red-600/90 to-red-700/90 
+                     border-b border-red-500/30"
+        >
+          <MapPin className="w-5 h-5 text-white" />
+          <span className="text-lg font-bold text-white tracking-wide">
+            Checked in at {DEMO_STORE.name}
+          </span>
+        </motion.div>
+
         <div className="flex items-center justify-between px-5 py-4">
           {/* Retailer Logo with fallback */}
           {retailer?.logo ? (
             <img 
               src={retailer.logo} 
               alt={retailer.name || 'Store'}
-              className="h-10 w-auto drop-shadow-2xl"
+              className="h-12 w-auto drop-shadow-2xl"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md 
+            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md 
                             flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">
+              <span className="text-white font-bold text-xl">
                 {retailer?.shortName?.[0] || 'S'}
               </span>
             </div>
@@ -226,23 +252,23 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
               exit={{ scale: 0, opacity: 0 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleRecoverLastCoupon}
-              className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-md 
+              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md 
                          flex items-center justify-center shadow-lg 
                          active:bg-white/20 transition-colors"
             >
-              <Undo2 className="w-5 h-5 text-white" />
+              <Undo2 className="w-7 h-7 text-white" />
             </motion.button>
           )}
           
-          {/* Savings Counter */}
+          {/* Savings Counter - TV READABLE (Large) */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-2 px-4 py-2 rounded-full 
-                       bg-white/10 backdrop-blur-md shadow-lg"
+            className="flex items-center gap-3 px-5 py-3 rounded-full 
+                       bg-green-500/90 backdrop-blur-md shadow-lg"
           >
-            <ShoppingCart className="w-4 h-4 text-white" />
-            <span className="text-sm font-bold text-white tabular-nums">
+            <ShoppingCart className="w-6 h-6 text-white" />
+            <span className="text-2xl font-black text-white tabular-nums">
               ${calculateTotalSavings().toFixed(2)}
             </span>
           </motion.div>
@@ -251,10 +277,10 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
       
       {/* CARD AREA - Full screen, single card */}
       <div className="absolute 
-                      top-24 
+                      top-32 
                       bottom-[calc(2rem+env(safe-area-inset-bottom,0px))]
-                      left-6 
-                      right-6">
+                      left-4 
+                      right-4">
         {isLoading || coupons.length === 0 ? (
           <EmptyState isLoading={isLoading} />
         ) : (
