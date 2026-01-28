@@ -1,0 +1,167 @@
+[
+  {
+    "brand": "Coca-Cola",
+    "category": "Beverages",
+    "title": "$2 Off Coca-Cola 12-Pack",
+    "description": "Save $2.00 on any Coca-Cola, Sprite, or Fanta 12-Pack Cans",
+    "value": 2.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/544/900/000/0996/front_en.581.400.jpg",
+    "expiration": "2026-02-01",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "General Mills",
+    "category": "Breakfast",
+    "title": "$1 Off Cheerios Cereal",
+    "description": "Save $1.00 on Cheerios, Lucky Charms, or Cinnamon Toast Crunch",
+    "value": 1.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/001/600/027/5287/front_en.8.400.jpg",
+    "expiration": "2026-02-28",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Oreo",
+    "category": "Snacks",
+    "title": "$1 Off Oreo Cookies",
+    "description": "Save $1.00 on Oreo Family Size Cookies 18.12oz+",
+    "value": 1.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/762/221/040/3225/front_en.34.400.jpg",
+    "expiration": "2026-02-28",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Lay's",
+    "category": "Snacks",
+    "title": "$1.50 Off Lay's Party Size",
+    "description": "Save $1.50 on Lay's Party Size Chips 13oz+",
+    "value": 1.50,
+    "image_url": "https://images.openfoodfacts.org/images/products/002/840/005/0283/front_en.100.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Tropicana",
+    "category": "Beverages",
+    "title": "$1 Off Tropicana OJ",
+    "description": "Save $1.00 on Tropicana Pure Premium Orange Juice 52oz",
+    "value": 1.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/004/850/001/3128/front_en.51.400.jpg",
+    "expiration": "2026-02-28",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Ben & Jerry's",
+    "category": "Frozen Foods",
+    "title": "BOGO Ben & Jerry's Pints",
+    "description": "Buy One Get One Free - Ben & Jerry's Ice Cream Pints",
+    "value": 5.99,
+    "image_url": "https://images.openfoodfacts.org/images/products/007/684/000/0508/front_en.97.400.jpg",
+    "expiration": "2026-02-01",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Tide",
+    "category": "Household",
+    "title": "$3 Off Tide Pods",
+    "description": "Save $3.00 on Tide Pods Laundry Detergent 32ct+",
+    "value": 3.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/003/700/098/0110/front_en.35.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Bounty",
+    "category": "Household",
+    "title": "$2 Off Bounty Paper Towels",
+    "description": "Save $2.00 on Bounty Select-A-Size Paper Towels 6 Double Rolls",
+    "value": 2.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/003/700/020/1210/front_en.13.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Folgers",
+    "category": "Beverages",
+    "title": "$2 Off Folgers Coffee",
+    "description": "Save $2.00 on Folgers Ground Coffee 22.6-30.5oz",
+    "value": 2.00,
+    "image_url": "https://images.openfoodfacts.org/images/products/002/550/000/5009/front_en.41.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "H-E-B",
+    "category": "Dairy",
+    "title": "$1.50 Off H-E-B Cheese",
+    "description": "Save $1.50 on H-E-B Bars, Shredded, or Sliced Cheese",
+    "value": 1.50,
+    "image_url": "https://images.openfoodfacts.org/images/products/004/149/906/4526/front_en.22.400.jpg",
+    "expiration": "2026-02-28",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Oscar Mayer",
+    "category": "Deli & Lunch",
+    "title": "BOGO Oscar Mayer Bacon",
+    "description": "Buy One Get One Free - Oscar Mayer Bacon 12-16oz",
+    "value": 7.99,
+    "image_url": "https://images.openfoodfacts.org/images/products/004/470/006/4505/front_en.11.400.jpg",
+    "expiration": "2026-02-01",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "DiGiorno",
+    "category": "Frozen Foods",
+    "title": "$2.50 Off DiGiorno Pizza",
+    "description": "Save $2.50 on DiGiorno Rising Crust or Stuffed Crust Pizza",
+    "value": 2.50,
+    "image_url": "https://images.openfoodfacts.org/images/products/007/192/710/1612/front_en.21.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Oikos",
+    "category": "Dairy",
+    "title": "$0.50 Off Oikos Yogurt",
+    "description": "Save $0.50 on Oikos Triple Zero Greek Yogurt 4-Pack",
+    "value": 0.50,
+    "image_url": "https://images.openfoodfacts.org/images/products/003/663/212/6011/front_en.10.400.jpg",
+    "expiration": "2026-02-28",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Kraft",
+    "category": "Dairy",
+    "title": "$0.75 Off Kraft Singles",
+    "description": "Save $0.75 on Kraft American Singles 16ct",
+    "value": 0.75,
+    "image_url": "https://images.openfoodfacts.org/images/products/002/100/064/7009/front_en.76.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  },
+  {
+    "brand": "Doritos",
+    "category": "Snacks",
+    "title": "$1.50 Off Doritos Party Size",
+    "description": "Save $1.50 on Doritos Nacho Cheese or Cool Ranch Party Size",
+    "value": 1.50,
+    "image_url": "https://images.openfoodfacts.org/images/products/002/840/032/8803/front_en.105.400.jpg",
+    "expiration": "2026-02-15",
+    "retailer_id": "heb",
+    "status": "active"
+  }
+]
