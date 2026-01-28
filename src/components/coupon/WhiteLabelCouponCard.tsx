@@ -11,6 +11,7 @@ interface Coupon {
   value: number;
   reason?: string;
   isPersonalized?: boolean;
+  brand?: string;
 }
 
 interface CouponCardProps {
@@ -60,34 +61,33 @@ export const CouponCard: React.FC<CouponCardProps> = ({ coupon, className }) => 
         }}
       />
       
-      {/* TEXT OVERLAY - Disney+ poster style - TV READABLE */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 pb-10">
-        {/* HERO: Discount Amount - HUGE for TV */}
-        <div className="flex items-baseline gap-4 mb-3">
-          <h1 className="text-8xl font-black text-white leading-none tracking-tight drop-shadow-2xl">
+      {/* TEXT OVERLAY - Bumble style: minimal, clean, TV READABLE from 10ft */}
+      <div className="absolute bottom-0 left-0 right-0 p-8 pb-12">
+        {/* HERO: Discount Amount - MASSIVE for TV visibility */}
+        <div className="flex items-baseline gap-4 mb-4">
+          <h1 className="text-[7rem] font-black text-white leading-none tracking-tight drop-shadow-2xl" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
             {displayValue}
           </h1>
-          <span className="text-3xl font-bold text-white/90 uppercase tracking-wide drop-shadow-lg">
+          <span className="text-4xl font-bold text-white/95 uppercase tracking-wider drop-shadow-lg">
             OFF
           </span>
         </div>
         
-        {/* Product Name - Larger for TV */}
-        <h2 className="text-2xl font-bold text-white/95 leading-snug mb-4 drop-shadow-lg">
-          {coupon?.description}
+        {/* Product Name - Bold, clear */}
+        <h2 className="text-3xl font-bold text-white leading-tight mb-4 drop-shadow-lg" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.6)' }}>
+          {coupon?.title}
         </h2>
         
-        {/* Metadata - Larger badges */}
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-1.5 rounded-lg border-2 border-white/50 text-base font-bold text-white backdrop-blur-sm">
-            EXPIRES TODAY
-          </div>
-          
-          {coupon?.reason && (
-            <span className="text-base font-semibold text-white/80">
-              • {coupon.reason}
-            </span>
+        {/* Brand + Expiry - Clean badges */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {coupon?.brand && (
+            <div className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-lg font-bold text-white">
+              {coupon.brand}
+            </div>
           )}
+          <div className="px-4 py-2 rounded-full bg-red-500/80 backdrop-blur-md text-lg font-bold text-white">
+            EXPIRES SOON
+          </div>
         </div>
       </div>
     </div>
