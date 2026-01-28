@@ -1,8 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { X, Heart, Sparkles } from "lucide-react";
 import { MotionValue } from "framer-motion";
-import { useRetailer } from "@/contexts/BrandContext";
 
 interface SwipeDirectionOverlayProps {
   bgOpacityLeft: MotionValue<number>;
@@ -17,59 +15,59 @@ const SwipeDirectionOverlay = ({
   isPersonalized,
   isAiGenerated
 }: SwipeDirectionOverlayProps) => {
-  const { retailer } = useRetailer(); // 🎨 WHITE-LABEL HOOK
-
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl z-10">
-      {/* 🎨 WHITE-LABELED LEFT OVERLAY (discard) - Uses retailer error color */}
+    <div className="absolute inset-0 pointer-events-none z-10">
+      {/* BUMBLE-STYLE: Subtle edge glow instead of full overlay */}
+      
+      {/* Left edge glow (skip) */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute left-0 top-0 bottom-0 w-32"
         style={{ 
           opacity: bgOpacityLeft,
-          backgroundColor: retailer.theme.error,
+          background: 'linear-gradient(to right, rgba(239, 68, 68, 0.6), transparent)',
         }}
+      />
+      
+      {/* Left "NOPE" stamp - appears when swiping left */}
+      <motion.div
+        className="absolute top-1/3 left-8 transform -rotate-12"
+        style={{ opacity: bgOpacityLeft }}
       >
-        <div 
-          className="bg-white/90 px-6 py-2 rounded-full font-bold text-xl transform -rotate-12"
-          style={{ color: retailer.theme.error }}
-        >
-          Skip
-        </div>
+        <span className="text-5xl font-black text-red-500 
+                         border-4 border-red-500 px-4 py-2 rounded-lg
+                         tracking-wide">
+          NOPE
+        </span>
       </motion.div>
       
-      {/* 🎨 WHITE-LABELED RIGHT OVERLAY (keep) - Uses retailer success color */}
+      {/* Right edge glow (save) */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute right-0 top-0 bottom-0 w-32"
         style={{ 
           opacity: bgOpacityRight,
-          backgroundColor: retailer.theme.success,
+          background: 'linear-gradient(to left, rgba(34, 197, 94, 0.6), transparent)',
         }}
-      >
-        <div 
-          className="bg-white/90 px-6 py-2 rounded-full font-bold text-xl transform rotate-12"
-          style={{ color: retailer.theme.success }}
-        >
-          Save
-        </div>
-      </motion.div>
+      />
       
-      {/* 🎨 WHITE-LABELED BADGE - Uses retailer accent/secondary colors */}
+      {/* Right "SAVE" stamp - appears when swiping right */}
+      <motion.div
+        className="absolute top-1/3 right-8 transform rotate-12"
+        style={{ opacity: bgOpacityRight }}
+      >
+        <span className="text-5xl font-black text-green-500 
+                         border-4 border-green-500 px-4 py-2 rounded-lg
+                         tracking-wide">
+          SAVE
+        </span>
+      </motion.div>
+
+      {/* Personalized badge - subtle, top corner */}
       {isPersonalized && (
-        <div className="absolute top-2 right-2 z-20">
-          <div 
-            className="px-2 py-1 rounded-full text-xs font-bold shadow-lg text-white"
-            style={{
-              background: isAiGenerated 
-                ? `linear-gradient(to right, ${retailer.theme.secondary}, ${retailer.theme.accent})`
-                : retailer.theme.accent,
-            }}
-          >
-            <div className="flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
-              <span>
-                {isAiGenerated ? 'AI Generated' : 'For You'}
-              </span>
-            </div>
+        <div className="absolute top-[calc(env(safe-area-inset-top,1rem)+4rem)] left-4 z-20">
+          <div className="px-3 py-1.5 rounded-full text-xs font-bold 
+                          bg-gradient-to-r from-yellow-400 to-orange-400
+                          text-black shadow-lg">
+            {isAiGenerated ? '✨ AI Pick' : '✨ For You'}
           </div>
         </div>
       )}

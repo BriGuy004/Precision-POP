@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, animate } from "framer-motion";
-import { ShoppingCart, Undo2, MapPin } from "lucide-react";
+import { MapPin, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRetailer } from "@/contexts/BrandContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,15 +12,15 @@ import SwipeDirectionOverlay from "./coupon/SwipeDirectionOverlay";
 import EmptyState from "./coupon/EmptyState";
 import hebCoupons from "@/data/hebCoupons";
 
-// Demo store location - can be customized
+// Demo store location
 const DEMO_STORE = {
   name: "H-E-B Mueller",
-  address: "1801 E 51st St, Austin",
+  address: "Austin, TX",
 };
 
 const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps) => {
   const { toast } = useToast();
-  const { retailer, retailerId } = useRetailer();
+  const { retailer } = useRetailer();
   
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,14 +32,11 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
 
   const currentCoupon = coupons[currentIndex];
   
-  // Fetch coupons from Supabase with guaranteed fallback
+  // Fetch coupons with guaranteed fallback
   useEffect(() => {
     const fetchCoupons = async () => {
       setIsLoading(true);
-      
-      // ALWAYS start with cached fallback for instant display
-      // This ensures demo NEVER shows empty state
-      setCoupons(hebCoupons);
+      setCoupons(hebCoupons); // Always start with cached
       
       try {
         const { data, error } = await supabase
@@ -48,14 +45,7 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
           .eq('status', 'active')
           .order('created_at', { ascending: false });
         
-        if (error) {
-          console.warn('Supabase error, using cached coupons:', error.message);
-          // Already have hebCoupons loaded, no action needed
-          return;
-        }
-        
-        if (data && data.length > 0) {
-          // Transform Supabase data to match Coupon type
+        if (!error && data && data.length > 0) {
           const transformedCoupons: Coupon[] = data.map(c => ({
             id: c.id,
             title: c.title,
@@ -68,20 +58,18 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
           }));
           setCoupons(transformedCoupons);
         }
-        // If no Supabase data, hebCoupons are already loaded
       } catch (error) {
-        console.error('Error fetching coupons, using cached:', error);
-        // hebCoupons already loaded, demo will work fine
+        console.error('Using cached coupons:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchCoupons();
-  }, [retailerId]);
+  }, []);
 
   const x = useMotionValue(0);
-  const rotate = useTransform(x, [-200, 0, 200], [-25, 0, 25]);
+  const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
   const bgOpacityLeft = useTransform(x, [-200, -50, 0], [0.8, 0, 0]);
   const bgOpacityRight = useTransform(x, [0, 50, 200], [0, 0, 0.8]);
 
@@ -97,32 +85,21 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
 
   useEffect(() => {
     const loadPersonalizedCoupons = async () => {
-      setIsLoading(true);
       try {
         const personalizedCoupons = await personalizationService.getPersonalizedCoupons(userId);
-        
         if (personalizedCoupons.length > 0) {
-          const newCoupons = personalizedCoupons.map((pc: any) => ({
-            ...pc,
-            isPersonalized: true,
-          }));
-          
-          setCoupons(prev => [...prev, ...newCoupons]);
+          setCoupons(prev => [...prev, ...personalizedCoupons.map((pc: any) => ({ ...pc, isPersonalized: true }))]);
         }
       } catch (error) {
         console.error("Error loading personalized coupons:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
-    
     loadPersonalizedCoupons();
-  }, [userId, toast]);
+  }, [userId]);
 
   const triggerHaptic = (type: 'light' | 'medium' | 'heavy') => {
     if ('vibrate' in navigator) {
-      const patterns = { light: 10, medium: 25, heavy: 50 };
-      navigator.vibrate(patterns[type]);
+      navigator.vibrate({ light: 10, medium: 25, heavy: 50 }[type]);
     }
   };
 
@@ -133,20 +110,14 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
     triggerHaptic('medium');
     setDirection(swipeDirection);
     
-    // Animate card off screen
     const exitX = swipeDirection === 'right' ? 500 : -500;
     await animate(x, exitX, { type: "spring", stiffness: 300, damping: 30 });
     
-    const dragInfo = {
-      distance: Math.abs(x.get()),
-      velocity: Math.abs(x.getVelocity()),
-    };
-
     analyticsService.trackSwipe(
       currentCoupon, 
       swipeDirection as 'left' | 'right', 
       method,
-      dragInfo
+      { distance: Math.abs(x.get()), velocity: Math.abs(x.getVelocity()) }
     );
     
     if (onCouponSwiped) {
@@ -156,16 +127,14 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         setDiscardedCoupons(prev => [...prev, currentCoupon]);
       } else if (swipeDirection === "right") {
         setSavedCoupons(prev => [...prev, currentCoupon]);
-        
         toast({
           title: "✓ SAVED!",
-          description: `${currentCoupon.title} - ${currentCoupon.description?.slice(0, 40)}...`,
-          duration: 2500,
+          description: `${currentCoupon.title} added to wallet`,
+          duration: 2000,
         });
       }
     }
     
-    // Remove card and reset for next
     setCoupons(prev => prev.filter((_, i) => i !== currentIndex));
     setDirection(null);
     x.set(0);
@@ -177,7 +146,6 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
     
     const SWIPE_THRESHOLD = 100;
     const VELOCITY_THRESHOLD = 500;
-    
     const velocity = Math.abs(info.velocity.x);
     const offset = info.offset.x;
     
@@ -186,7 +154,6 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
     } else if (offset < -SWIPE_THRESHOLD || (offset < -50 && velocity > VELOCITY_THRESHOLD)) {
       await handleSwipe("left", "gesture");
     } else {
-      // Spring back to center with smooth animation
       triggerHaptic('light');
       animate(x, 0, { type: "spring", stiffness: 500, damping: 30 });
     }
@@ -194,93 +161,18 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
 
   const handleRecoverLastCoupon = () => {
     if (discardedCoupons.length === 0) return;
-    
     const lastDiscarded = discardedCoupons[discardedCoupons.length - 1];
     setCoupons(prev => [lastDiscarded, ...prev]);
     setDiscardedCoupons(prev => prev.slice(0, -1));
-    
     triggerHaptic('light');
-    toast({
-      title: "Recovered!",
-      description: "Coupon added back to queue",
-      duration: 2000,
-    });
   };
+
+  const totalSavings = calculateTotalSavings();
 
   return (
     <div className="fixed inset-0 bg-black">
-      {/* CLEAN TOP BAR - Bumble/Disney+ style */}
-      <div className="absolute top-0 left-0 right-0 z-50 
-                      bg-gradient-to-b from-black/90 via-black/70 to-transparent 
-                      pt-[env(safe-area-inset-top,1rem)]">
-        {/* CHECK-IN BANNER - TV Readable */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2 py-2 px-4 
-                     bg-gradient-to-r from-red-600/90 to-red-700/90 
-                     border-b border-red-500/30"
-        >
-          <MapPin className="w-5 h-5 text-white" />
-          <span className="text-lg font-bold text-white tracking-wide">
-            Checked in at {DEMO_STORE.name}
-          </span>
-        </motion.div>
-
-        <div className="flex items-center justify-between px-5 py-4">
-          {/* Retailer Logo with fallback */}
-          {retailer?.logo ? (
-            <img 
-              src={retailer.logo} 
-              alt={retailer.name || 'Store'}
-              className="h-12 w-auto drop-shadow-2xl"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md 
-                            flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">
-                {retailer?.shortName?.[0] || 'S'}
-              </span>
-            </div>
-          )}
-          
-          {/* Undo Button (conditional) */}
-          {discardedCoupons.length > 0 && (
-            <motion.button
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleRecoverLastCoupon}
-              className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md 
-                         flex items-center justify-center shadow-lg 
-                         active:bg-white/20 transition-colors"
-            >
-              <Undo2 className="w-7 h-7 text-white" />
-            </motion.button>
-          )}
-          
-          {/* Savings Counter - TV READABLE (Large) */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="flex items-center gap-3 px-5 py-3 rounded-full 
-                       bg-green-500/90 backdrop-blur-md shadow-lg"
-          >
-            <ShoppingCart className="w-6 h-6 text-white" />
-            <span className="text-2xl font-black text-white tabular-nums">
-              ${calculateTotalSavings().toFixed(2)}
-            </span>
-          </motion.div>
-        </div>
-      </div>
-      
-      {/* CARD AREA - Full screen, single card */}
-      <div className="absolute 
-                      top-32 
-                      bottom-[calc(2rem+env(safe-area-inset-bottom,0px))]
-                      left-4 
-                      right-4">
+      {/* ===== BUMBLE-STYLE: FULL-BLEED CARD ===== */}
+      <div className="absolute inset-0">
         {isLoading || coupons.length === 0 ? (
           <EmptyState isLoading={isLoading} />
         ) : (
@@ -288,23 +180,12 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
             {currentCoupon && (
               <motion.div
                 key={currentCoupon.id}
-                className="absolute inset-0 rounded-2xl overflow-hidden"
+                className="absolute inset-0"
                 style={{ x, rotate }}
-                initial={{ scale: 0.9, opacity: 0, y: 30 }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1,
-                  y: 0,
-                }}
-                exit={{ 
-                  opacity: 0,
-                  transition: { duration: 0.1 }
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 400, 
-                  damping: 35
-                }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 drag="x"
                 dragConstraints={{ left: -300, right: 300 }}
                 onDragEnd={handleDragEnd}
@@ -325,57 +206,91 @@ const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps)
         )}
       </div>
 
-      {/* FIRST-TIME USER HINT */}
-      {currentIndex === 0 && (
+      {/* ===== FLOATING UI - MINIMAL CHROME ===== */}
+      
+      {/* Top: Check-in pill (subtle, floating) */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="absolute top-[calc(env(safe-area-inset-top,1rem)+0.75rem)] left-1/2 -translate-x-1/2 z-50"
+      >
+        <div className="flex items-center gap-2 px-4 py-2 
+                        bg-black/40 backdrop-blur-xl rounded-full
+                        border border-white/10 shadow-2xl">
+          <MapPin className="w-4 h-4 text-red-400" />
+          <span className="text-sm font-semibold text-white">
+            {DEMO_STORE.name}
+          </span>
+        </div>
+      </motion.div>
+
+      {/* Top-right: Savings counter (only show if savings > 0) */}
+      <AnimatePresence>
+        {totalSavings > 0 && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            className="absolute top-[calc(env(safe-area-inset-top,1rem)+0.75rem)] right-4 z-50"
+          >
+            <div className="px-4 py-2 bg-green-500 rounded-full shadow-2xl">
+              <span className="text-xl font-black text-white tabular-nums">
+                ${totalSavings.toFixed(2)}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Top-left: Undo button (only show if there are discarded coupons) */}
+      <AnimatePresence>
+        {discardedCoupons.length > 0 && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleRecoverLastCoupon}
+            className="absolute top-[calc(env(safe-area-inset-top,1rem)+0.75rem)] left-4 z-50
+                       w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl
+                       border border-white/10 shadow-2xl
+                       flex items-center justify-center"
+          >
+            <RotateCcw className="w-5 h-5 text-white" />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Bottom: Subtle swipe hint (fades after first card) */}
+      {currentIndex === 0 && coupons.length > 0 && (
         <motion.div
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ delay: 3, duration: 1 }}
-          className="absolute bottom-32 left-1/2 -translate-x-1/2 
-                     px-5 py-2 bg-black/60 backdrop-blur-md rounded-full z-40
-                     pointer-events-none"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ delay: 0.5 }}
+          className="absolute bottom-[calc(env(safe-area-inset-bottom,1rem)+2rem)] 
+                     left-1/2 -translate-x-1/2 z-40 pointer-events-none"
         >
-          <p className="text-sm text-white font-medium">
-            Swipe to save or skip
-          </p>
+          <motion.div
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center gap-6 text-white/70"
+          >
+            <span className="text-sm font-medium">← Skip</span>
+            <div className="w-12 h-1 bg-white/30 rounded-full" />
+            <span className="text-sm font-medium">Save →</span>
+          </motion.div>
         </motion.div>
       )}
 
-      {/* DEBUG PANEL */}
-      {process.env.NODE_ENV === 'development' && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed 
-                     bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))]
-                     left-4 right-4 
-                     bg-black/90 backdrop-blur-md text-white p-3 rounded-xl 
-                     text-xs border border-white/10 shadow-2xl font-mono 
-                     max-w-sm mx-auto"
-        >
-          <div className="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-            <span className="text-white/60">DEBUG</span>
-            <span className="text-green-400 flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              LIVE
-            </span>
-          </div>
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span className="text-white/60">Card:</span>
-              <span className="text-white font-bold">{currentIndex + 1}/{coupons.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/60">Saved:</span>
-              <span className="text-green-400 font-bold">${calculateTotalSavings().toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/60">Drag:</span>
-              <span className="text-blue-400 font-bold">{Math.round(x.get())}px</span>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      {/* Bottom: Card counter (subtle) */}
+      <div className="absolute bottom-[calc(env(safe-area-inset-bottom,1rem)+0.5rem)] 
+                      left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+        <span className="text-xs font-medium text-white/40 tabular-nums">
+          {coupons.length > 0 ? `${coupons.length} deals left` : ''}
+        </span>
+      </div>
     </div>
   );
 };
