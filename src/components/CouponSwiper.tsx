@@ -3,6 +3,7 @@ import { motion, AnimatePresence, PanInfo, useMotionValue, useTransform, animate
 import { ShoppingCart, Undo2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRetailer } from "@/contexts/BrandContext";
+import { supabase } from "@/integrations/supabase/client";
 import { personalizationService } from "../services/PersonalizationService";
 import { analyticsService } from "../services/AnalyticsService";
 import { Coupon, CouponSwiperProps } from "./coupon/types";
@@ -13,17 +14,59 @@ import hebCoupons from "@/data/hebCoupons";
 
 const CouponSwiper = ({ onCouponSwiped, userId = "user123" }: CouponSwiperProps) => {
   const { toast } = useToast();
-  const { retailer } = useRetailer();
+  const { retailer, retailerId } = useRetailer();
   
-  const [coupons, setCoupons] = useState<Coupon[]>(hebCoupons);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<string | null>(null);
   const [savedCoupons, setSavedCoupons] = useState<Coupon[]>([]);
   const [discardedCoupons, setDiscardedCoupons] = useState<Coupon[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSwiping, setIsSwiping] = useState(false);
 
   const currentCoupon = coupons[currentIndex];
+  
+  // Fetch coupons from Supabase
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('coupons')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          // Transform Supabase data to match Coupon type
+          const transformedCoupons: Coupon[] = data.map(c => ({
+            id: c.id,
+            title: c.title,
+            description: c.description || '',
+            image: c.image_url || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400',
+            value: c.value,
+            expiresAt: c.expiration || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            category: c.category,
+            brand: c.brand,
+          }));
+          setCoupons(transformedCoupons);
+        } else {
+          // Fallback to hardcoded coupons if no data in Supabase
+          setCoupons(hebCoupons);
+        }
+      } catch (error) {
+        console.error('Error fetching coupons:', error);
+        // Fallback to hardcoded coupons on error
+        setCoupons(hebCoupons);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCoupons();
+  }, [retailerId]);
 
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-25, 0, 25]);
