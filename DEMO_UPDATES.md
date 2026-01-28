@@ -1,110 +1,176 @@
-# Precision POP - Demo Prep Updates
-## Consumer App (precision-pop-2)
-**Date:** January 28, 2026
-**Focus:** TV-readable investor demo with Phone + Tablet + TV setup
+# Precision POP - Demo Updates
+
+**Last Updated:** January 28, 2025
+**Prepared for:** Investor Demo - Phone + Tablet + TV Screen Share
 
 ---
 
-## ✅ Completed Tasks
+## Overview
 
-### 1. Real Product Images
-- Replaced all Unsplash placeholder images with real product photos from **Open Food Facts API**
-- Updated `seed-data/kroger-coupons.json` with 15 H-E-B coupons using real product URLs
-- Updated `src/data/hebCoupons.ts` with matching fallback data
-- Products include: Coca-Cola, Cheerios, Oreo, Lay's, Tropicana, Ben & Jerry's, Tide, Bounty, Folgers, Oscar Mayer, DiGiorno, Doritos, Kraft
+The admin dashboards in `precision-pop-backend` have been optimized for:
+- **Tablet display** (1024×768 and 1366×1024 resolutions)
+- **TV screen share** (high contrast, large text)
+- **Touch interaction** (56px minimum tap targets)
+- **Investor clarity** (money flow visualization)
 
-### 2. H-E-B Primary Branding
-- Changed default retailer from `demo` to `heb` in `src/config/retailers.ts`
-- App now loads with H-E-B branding by default (red theme, H-E-B logo)
+---
 
-### 3. "Checked in at H-E-B" Header
-- Added prominent check-in banner at top of coupon swiper
-- Shows: `📍 Checked in at H-E-B Mueller`
-- Styled with red gradient background matching H-E-B branding
-- Location: `CouponSwiper.tsx` - configurable via `DEMO_STORE` constant
+## What Changed
 
-### 4. Cached Coupon Fallback (Zero Fail Demo)
-- Enhanced fallback logic in `CouponSwiper.tsx`
-- **ALWAYS loads cached coupons first** - demo never shows empty state
-- If Supabase fails, cached `hebCoupons` remain visible
-- Graceful error handling with console warnings (not user-facing)
+### 1. CSS Demo Utilities (`src/index.css`)
 
-### 5. TV-Readable Text
-Increased font sizes throughout for 10+ feet visibility:
+Added new utility classes:
+- `.demo-btn` — Large touch-friendly buttons (min 56px height)
+- `.demo-heading` — 4xl bold text for TV visibility
+- `.demo-stat-value` — 5xl bold numbers for metrics
+- `.demo-stat-label` — Legible metric labels
+- `.money-flow-card` — Green gradient highlight showing revenue
+- Tablet-responsive grid utilities
+- TV-mode responsive breakpoints
 
-| Element | Before | After |
-|---------|--------|-------|
-| Savings Amount | `text-6xl` | `text-8xl` |
-| "OFF" label | `text-2xl` | `text-3xl` |
-| Product Name | `text-xl` | `text-2xl` |
-| Expiry Badge | `text-xs` | `text-base` |
-| Savings Counter | `text-sm` | `text-2xl` |
-| Toast Messages | default | `text-xl font-bold` |
+### 2. Grocer Dashboard (`src/pages/GrocerDashboard.tsx`)
 
-### 6. Swipe Mechanics
-- Verified existing swipe gesture handling works correctly
-- Proper threshold detection (100px or velocity-based)
-- Haptic feedback on swipe
-- Smooth card exit animations
-- Undo functionality for discarded coupons
+**Demo-Ready Features:**
+- ✅ Pre-loaded with realistic mock data (HEB Mueller store)
+- ✅ Large stat cards with 5xl numbers
+- ✅ Clear money flow visualization:
+  - Promo Revenue (from redemptions)
+  - Brand Media Revenue (from bidding)
+  - Monthly Projection
+- ✅ Flash promo cards with inventory progress bars
+- ✅ Conversion metrics: impressions → accepts → redemptions
+- ✅ 56px minimum tap targets for all buttons
+- ✅ Sidebar nav optimized for touch
+
+**Mock Data Includes:**
+- 847 daily check-ins
+- 12 active flash promos
+- $2,847 promo revenue
+- $1,250 brand media revenue
+- 3 active brand campaigns paying CPM
+
+### 3. Brand Dashboard (`src/pages/BrandDashboard.tsx`)
+
+**Demo-Ready Features:**
+- ✅ Pre-loaded with 3 active demo campaigns
+- ✅ "Your Investment Performance" hero banner showing:
+  - Total Spent → ROAS Multiplier → Revenue Generated
+- ✅ Money flow arrow visualization
+- ✅ Campaign cards with:
+  - Budget progress bars
+  - CTR, Conversions, ROAS metrics
+  - Target segment badges
+- ✅ Large metrics for TV viewing
+
+**Mock Data Includes:**
+- $4,450 total spent
+- 5.4x ROAS
+- $23,767 revenue generated
+- 86,620 total impressions
+
+### 4. Coupon Manager (`src/pages/grocer-dashboard/CouponManager.tsx`)
+
+**Demo-Ready Features:**
+- ✅ Pre-loaded with 3 demo coupons
+- ✅ Total Bidding Revenue summary card (green gradient)
+- ✅ Large "Create New Coupon" button (56px height)
+- ✅ Coupon cards showing:
+  - Impressions and redemption rate
+  - Bid revenue per coupon
+  - Active bids count
+- ✅ Expandable brand bids section showing money flow
+- ✅ Touch-friendly dialog for coupon creation
+
+**Mock Data Includes:**
+- Horizon, Chobani, HEB coupons
+- Brand bids from Organic Valley, Oatly
+- Per-impression bid amounts
+
+### 5. Create Campaign (`src/pages/CreateCampaign.tsx`)
+
+**Demo-Ready Features:**
+- ✅ Clear audience targeting section (purple highlight)
+- ✅ Budget & Bidding section (green highlight)
+- ✅ Live preview panel showing:
+  - Estimated impressions
+  - Estimated unique reach
+  - Estimated conversions
+- ✅ Money flow breakdown (where your money goes)
+- ✅ Pre-loaded segment options
+
+### 6. BrandDashboardLayout (`src/components/BrandDashboardLayout.tsx`)
+
+- ✅ Sidebar nav items with 56px min-height
+- ✅ Larger icons (24px)
+- ✅ Tablet-responsive width
+
+---
+
+## How to Demo
+
+### Route URLs:
+
+1. **Home/Landing:** `/`
+2. **Grocer Dashboard:** `/grocer-dashboard`
+3. **Coupon Manager:** `/grocer-dashboard/coupons`
+4. **Brand Dashboard:** `/brand-dashboard`
+5. **Create Campaign:** `/brand-dashboard/create-campaign`
+
+### Demo Flow Suggestion:
+
+**Act 1: Retailer Perspective (Tablet)**
+1. Start at Grocer Dashboard (`/grocer-dashboard`)
+2. Show the 4 stat cards - especially the revenue
+3. Scroll to Active Flash Promotions - show inventory tracking
+4. Scroll to Retail Media Revenue - show brand payments
+5. Click "Manage Coupons" to show coupon management
+6. Expand a coupon to show brand bids
+
+**Act 2: Brand Perspective (Tablet/TV)**
+1. Navigate to Brand Dashboard (`/brand-dashboard`)
+2. Show the Investment Performance banner
+3. Click through campaign cards to show metrics
+4. Click "New Campaign" to show targeting + budgeting
+5. Point out the money flow preview
+
+**Key Talking Points:**
+- "Retailers earn passive income from brand bids"
+- "Brands pay for precision targeting, not wasted impressions"
+- "Real-time metrics show exactly what's working"
+- "Every dollar is trackable from spend to redemption"
+
+---
+
+## What's NOT Included (Skipped per requirements)
+
+- ❌ Real auction mechanics
+- ❌ Conquest targeting complexity
+- ❌ A/B testing features
+- ❌ Complex analytics dashboards
+- ❌ Real Supabase database connections (uses mock data)
+
+---
+
+## Technical Notes
+
+- All auth is bypassed ("GOD MODE" enabled)
+- Mock data is hardcoded in each component
+- No network requests needed - works offline
+- Responsive from 768px to 4K
 
 ---
 
 ## Files Modified
-```
-precision-pop-2/
-├── src/
-│   ├── components/
-│   │   ├── CouponSwiper.tsx      # Check-in banner, fallback logic, larger counter
-│   │   ├── coupon/
-│   │   │   └── WhiteLabelCouponCard.tsx  # TV-readable text sizes
-│   │   └── ui/
-│   │       └── sonner.tsx        # Large green toast notifications
-│   ├── config/
-│   │   └── retailers.ts          # H-E-B as default
-│   └── data/
-│       └── hebCoupons.ts         # Real product images, fallback data
 
-seed-data/
-└── kroger-coupons.json           # Updated with H-E-B + real images
+```
+src/index.css                           - Demo CSS utilities
+src/pages/GrocerDashboard.tsx          - Retailer dashboard
+src/pages/BrandDashboard.tsx           - Brand dashboard
+src/pages/CreateCampaign.tsx           - Campaign builder
+src/pages/grocer-dashboard/CouponManager.tsx - Coupon management
+src/components/BrandDashboardLayout.tsx - Brand sidebar layout
 ```
 
 ---
 
-## Commit History
-1. `abea54d` - Demo prep: TV-readable text, H-E-B default, real product images, check-in banner
-2. `196f304` - Update seed data with H-E-B branding and real product images
-
-**Pushed to:** `https://github.com/BriGuy004/precision-pop-2.git`
-
----
-
-## Demo Setup Notes
-1. **Phone:** Consumer app - swipe coupons, see savings
-2. **Tablet:** Admin app - brand campaign management
-3. **TV:** Screen share phone via AirPlay/Chromecast
-
-### Check-in Location (Customizable)
-```typescript
-// src/components/CouponSwiper.tsx
-const DEMO_STORE = {
-  name: "H-E-B Mueller",
-  address: "1801 E 51st St, Austin",
-};
-```
-
----
-
-## Testing Checklist
-- [ ] App loads with H-E-B branding
-- [ ] Check-in banner shows "H-E-B Mueller"
-- [ ] Product images load (real products, not placeholders)
-- [ ] Swipe right saves coupon + shows green toast
-- [ ] Swipe left discards + undo button appears
-- [ ] Savings counter updates correctly
-- [ ] Text is readable from 10+ feet on TV
-- [ ] App works offline (cached coupons load)
-
----
-
-*Generated by Clawd for Precision POP investor demo prep*
+*Demo prep completed by Claude subagent - January 28, 2025*
